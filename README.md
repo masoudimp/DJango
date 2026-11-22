@@ -25,10 +25,23 @@ are deferred in the [user-requested TODO list](docs/todo.md).
 
 ## AI assistance
 
+Codex also integrated Bootstrap and generated the shared base template.
+
 Codex generated the initial `Tag`, `Category`, `AssetType`, `Asset`, and `Product` models,
 app configuration, and migrations, added the Category parent relation, and assisted
 with setup and documentation. Applicant review and personal modifications to the
 generated implementation are pending.
+
+## Bootstrap and templates
+
+Bootstrap 5.3.9 compiled CSS and bundled JavaScript (including Popper) are stored
+locally under `products/static/products/vendor/bootstrap/`, with their license.
+Source: https://cdn.jsdelivr.net/npm/bootstrap@5.3.9/.
+No npm installation, front-end build, or runtime CDN access is required.
+
+New templates can use `{% extends "products/base.html" %}` and override the
+`title`, `content`, `extra_css`, and `extra_js` blocks. The base template is ready;
+no listing view or route has been added yet.
 
 ## Database
 

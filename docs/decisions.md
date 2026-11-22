@@ -156,6 +156,26 @@ Record meaningful project decisions here so the applicant and future agents can 
 
 **Supersedes / superseded by:** Replaces the earlier conversational preference for a custom ProductTag model.
 
+### DEC-008: Use locally bundled Bootstrap for Django templates
+
+- Date: 2026-11-22
+- Status: Accepted
+- Source / decision maker: User (Bootstrap); Agent (local assets and base template)
+
+**Context:** Prepare Bootstrap for future views without implementing application pages yet.
+
+**Options considered:** CDN inclusion, local compiled assets, or an npm build pipeline.
+
+**Decision:** Use Bootstrap 5.3.9, the current stable release identified in the official Bootstrap documentation and blog. Store compiled CSS, bundled JavaScript including Popper, and the license locally. Provide `products/base.html` with reusable template blocks.
+
+**Rationale:** Local assets avoid runtime CDN dependencies and require no front-end build tooling for this small Django assignment.
+
+**Tradeoffs:** Dependency updates require replacing the bundled files. No custom styling, listing view, or route is introduced.
+
+**Implementation / verification:** Downloaded version-pinned files from jsDelivr. Django's system check passed; rendering the base template and resolving both static assets succeeded. No browser UI verification was performed because no page route exists yet. No TODO items added.
+
+**Supersedes / superseded by:** None.
+
 ## Entry template
 
 Copy this template into the Decisions section for each new entry:
