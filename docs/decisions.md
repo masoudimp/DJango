@@ -96,6 +96,26 @@ Record meaningful project decisions here so the applicant and future agents can 
 
 **Supersedes / superseded by:** None.
 
+### DEC-005: Add an optional parent to Category
+
+- Date: 2026-11-22
+- Status: Accepted
+- Source / decision maker: User (hierarchy and deferred validation); Agent (PROTECT deletion behavior)
+
+**Context:** The user requested parent/child categories using a nullable parent ID, with hierarchy validation deferred to user-requested TODOs.
+
+**Options considered:** Flat categories, or a self-referencing foreign key.
+
+**Decision:** Add a self-referencing `parent` foreign key with `null=True`, `blank=True`, and `related_name="children"`. Use `PROTECT` to prevent deletion of a parent that still has children. Keep the existing title constraints.
+
+**Rationale:** Root categories have no parent; other categories reference their parent through the generated `parent_id` column. Protection avoids accidental deletion of child categories.
+
+**Tradeoffs:** A parent with children cannot be deleted until those relationships are removed or reassigned. Self-parent and cycle prevention are intentionally deferred in [the TODO list](todo.md), so the current model does not guarantee an acyclic hierarchy. This optional feature does not conflict with the assignment.
+
+**Implementation / verification:** Added the field and generated `0003_category_parent.py`; migration was not applied. Django system and migration consistency checks passed.
+
+**Supersedes / superseded by:** Replaces the flat-category aspect of DEC-004; its other decisions remain unchanged.
+
 ## Entry template
 
 Copy this template into the Decisions section for each new entry:

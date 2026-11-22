@@ -18,6 +18,14 @@ Before implementing a user decision, check whether it conflicts with the origina
 
 ## 1. Inspect and plan
 
+### TODO ownership
+
+Only the user may determine the contents of [the TODO list](todo.md). Add an item
+only when the user explicitly requests or approves it. Do not create agent-generated
+backlog items, expand requested items into unrelated tasks, or copy the assignment
+checklist into TODOs. Existing assignment requirements remain requirements; they
+do not automatically become user-requested TODOs.
+
 - [ ] Read repository instructions and existing source before making changes.
 - [ ] Read [the decision log](decisions.md) before implementation and record meaningful decisions, alternatives, rationale, and tradeoffs there as work progresses. Keep its entries and the README consistent with the implementation.
 - [ ] Identify what already exists and preserve unrelated user changes.
