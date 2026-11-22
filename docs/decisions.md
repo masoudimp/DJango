@@ -116,6 +116,26 @@ Record meaningful project decisions here so the applicant and future agents can 
 
 **Supersedes / superseded by:** Replaces the flat-category aspect of DEC-004; its other decisions remain unchanged.
 
+### DEC-006: Store assets by URL with unique titles
+
+- Date: 2026-11-22
+- Status: Accepted
+- Source / decision maker: User (models and unique titles); Agent (PROTECT deletion behavior)
+
+**Context:** Add assets and asset types before implementing Product, using the proposed fields and the user's requirement that asset titles be unique.
+
+**Options considered:** URL references versus uploaded files; unique versus non-unique asset titles.
+
+**Decision:** Define `AssetType` with an automatic ID and a required, unique title of up to 100 characters. Define `Asset` with an automatic ID, a required, unique title of up to 200 characters, a required `URLField` (default limit: 200 characters), and a required foreign key to `AssetType`. Use `PROTECT` for deletion and `assets` for reverse access.
+
+**Rationale:** Implements the agreed URL-based structure and avoids deleting a type that is still referenced by assets.
+
+**Tradeoffs:** Files are not uploaded or stored by the application. Titles are globally unique within each model, but case variants may coexist. These models are optional additions to the assignment. No Product model or relationship is introduced.
+
+**Implementation / verification:** Generated `0004_assettype_asset.py` without applying it. Django system and migration consistency checks passed. No TODO items were added.
+
+**Supersedes / superseded by:** None.
+
 ## Entry template
 
 Copy this template into the Decisions section for each new entry:
