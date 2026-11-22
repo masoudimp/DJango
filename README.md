@@ -17,7 +17,9 @@ endpoint uses CSRF protection but does not yet require login.
 ### Management UI preview
 
 The header's **Admin** button now opens `/manage/`. Choose Products, Categories,
-or Tags to see a sample table with row-level Edit/Delete buttons and an Add button.
+or Tags to see tables with row-level Edit/Delete buttons and an Add button.
+Tags are read from SQLite, ordered by title; an empty table shows “No tags found.”
+Products and categories still use sample rows.
 Add opens the relevant form in a modal; Edit opens it prefilled with the sample row.
 Delete opens a confirmation preview. These new management forms are deliberately
 UI-only: they do not call the real tag endpoint, save data, or delete records.

@@ -40,7 +40,7 @@ def dashboard(request, tag_form=None):
 
 
 def management(request):
-    # Sample rows for the management UI; no database reads or writes.
+    # Products and categories are samples; tags come from the database.
     sections = [
         {"key": "product", "title": "Products", "detail_label": "Category", "rows": [
             {"id": 1, "title": "Cordless drill", "detail": "Power tools", "category": "power-tools", "tags": "Cordless|Compact", "description": "Compact cordless drill for everyday installation and assembly work."},
@@ -52,11 +52,7 @@ def management(request):
             {"id": 2, "title": "Power tools", "detail": "Tools", "category": "tools"},
             {"id": 3, "title": "Drills", "detail": "Power tools", "category": "power-tools"},
         ]},
-        {"key": "tag", "title": "Tags", "rows": [
-            {"id": 1, "title": "Cordless"},
-            {"id": 2, "title": "Compact"},
-            {"id": 3, "title": "Lightweight"},
-        ]},
+        {"key": "tag", "title": "Tags", "rows": Tag.objects.order_by("title", "id")},
     ]
     return render(request, "products/management.html", {
         "sections": sections,

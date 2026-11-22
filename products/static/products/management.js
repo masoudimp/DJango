@@ -63,7 +63,7 @@ const deletePreview = document.getElementById("delete-preview");
 document.querySelectorAll("[data-manage-delete]").forEach((button) => {
     button.addEventListener("click", () => {
         managementTrigger = button;
-        document.getElementById("delete-preview-text").textContent = `Delete “${button.closest("tr").dataset.title}”?`;
+        document.getElementById("delete-preview-text").textContent = `Do you want to delete “${button.closest("tr").dataset.title}”?`;
         document.getElementById("delete-preview-status").textContent = "Preview only — no records will be deleted.";
         bootstrap.Modal.getOrCreateInstance(deletePreview).show();
     });
