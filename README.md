@@ -2,13 +2,13 @@
 
 ## Current models
 
-The `products` app currently defines `Tag`: an automatic integer primary key (`id`)
-and a required, unique `title` of up to 100 characters. Product and category models
-are not implemented yet.
+The `products` app currently defines `Tag` and `Category`. Each has an automatic
+integer primary key (`id`) and a required, unique `title` of up to 100 characters.
+The Product model and its relationships are not implemented yet.
 
 ## AI assistance
 
-Codex generated the initial `Tag` model, app configuration, and migration, and
+Codex generated the initial `Tag` and `Category` models, app configuration, and migrations, and
 assisted with setup and documentation. Applicant review and personal modifications
 to the generated implementation are pending.
 

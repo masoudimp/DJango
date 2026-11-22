@@ -76,6 +76,26 @@ Record meaningful project decisions here so the applicant and future agents can 
 
 **Supersedes / superseded by:** None.
 
+### DEC-004: Define Category consistently with Tag
+
+- Date: 2026-11-22
+- Status: Accepted
+- Source / decision maker: User (add categories); Agent (field choices)
+
+**Context:** Add categories as the next model in the incremental implementation.
+
+**Options considered:** A minimal title-based model matching Tag, or additional fields and a category hierarchy.
+
+**Decision:** Define `Category` in the `products` app with an automatic `BigAutoField` ID and a required, unique title of up to 100 characters. Return the title from `__str__` and set the plural display name to `categories`.
+
+**Rationale:** Matches the existing Tag model and keeps the implementation within the assignment's scope.
+
+**Tradeoffs:** Title constraints are implementation assumptions, not employer requirements. Case variants may coexist; no category hierarchy is provided.
+
+**Implementation / verification:** Generated `0002_category.py`. Django's system check passed and the migration consistency check reported no changes. This migration has not been applied. Product relationships and admin registration remain pending.
+
+**Supersedes / superseded by:** None.
+
 ## Entry template
 
 Copy this template into the Decisions section for each new entry:
