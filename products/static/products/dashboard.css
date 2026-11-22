@@ -189,3 +189,12 @@ html[data-input-mode="keyboard"] .tag-option .form-check-input:focus { outline: 
     .card-body.p-4 { padding: 1rem !important; }
     header .small { display: none; }
 }
+
+.category-floating-menu:popover-open {
+    position: fixed;
+    inset: auto;
+    margin: 0;
+    overflow-y: auto;
+    min-width: 0;
+}
+.category-floating-menu .category-menu { max-height: none; overflow: visible; }

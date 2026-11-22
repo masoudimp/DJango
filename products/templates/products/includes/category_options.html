@@ -1,0 +1,15 @@
+{% for category in nodes %}
+<li>
+    <div class="category-branch">
+        <button type="button" class="dropdown-item" data-category="{{ category.pk }}">{{ category.title }}</button>
+        {% if category.picker_children %}
+        <button type="button" class="category-toggle" aria-label="Toggle {{ category.title }} subcategories" aria-expanded="false" aria-controls="{{ prefix }}category-{{ category.pk }}-children"><span aria-hidden="true">›</span></button>
+        {% endif %}
+    </div>
+    {% if category.picker_children %}
+    <ul id="{{ prefix }}category-{{ category.pk }}-children" class="category-children list-unstyled collapse">
+        {% include "products/includes/category_options.html" with nodes=category.picker_children %}
+    </ul>
+    {% endif %}
+</li>
+{% endfor %}

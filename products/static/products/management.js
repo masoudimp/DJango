@@ -22,7 +22,7 @@ function openManagementForm(kind, row, trigger) {
     form.querySelector("h3").hidden = true;
     form.querySelector('[type="submit"]').textContent = editing ? "Save changes" : `Add ${kind}`;
     form.dataset.mode = editing ? "edit" : "add";
-    if (kind === "tag") {
+    if (kind === "tag" || kind === "category") {
         form.action = editing ? row.dataset.editUrl : form.dataset.createUrl;
     }
     document.querySelectorAll("#admin-forms > .collapse").forEach((item) => {
@@ -73,7 +73,9 @@ document.querySelectorAll("[data-manage-delete]").forEach((button) => {
         deleteForm.action = deleteUrl || "";
         document.getElementById("delete-preview-text").textContent = `Do you want to delete “${button.closest("tr").dataset.title}”?`;
         document.getElementById("delete-preview-status").textContent = deleteUrl
-            ? "This will delete the tag and remove it from any linked products."
+            ? button.closest("tr").dataset.kind === "category"
+                ? "Categories with subcategories or products cannot be deleted."
+                : "This will delete the tag and remove it from any linked products."
             : "Preview only — no records will be deleted.";
         bootstrap.Modal.getOrCreateInstance(deletePreview).show();
     });
@@ -92,19 +94,20 @@ const managementSuccess = document.getElementById("management-success");
 if (managementSuccess) {
     bootstrap.Modal.getOrCreateInstance(managementSuccess).show();
     managementSuccess.addEventListener("hidden.bs.modal", () => {
-        document.getElementById("tag-tab").focus();
+        document.querySelector('[role="tab"][aria-selected="true"]')?.focus();
     });
 }
 
-const createTagForm = document.getElementById("create-tag-form");
-if (document.getElementById("management-tag-invalid")) {
-    const editing = createTagForm.dataset.mode === "edit";
-    document.getElementById("admin-modal-title").textContent = editing ? "Edit tag" : "Add tag";
-    createTagForm.querySelector('[type="submit"]').textContent = editing ? "Save changes" : "Add tag";
-    document.getElementById("add-tag-panel").classList.add("show");
-    createTagForm.querySelector("h3").hidden = true;
+["tag", "category"].forEach((kind) => {
+    const form = document.getElementById(`create-${kind}-form`);
+    if (!document.getElementById(`management-${kind}-invalid`)) return;
+    const editing = form.dataset.mode === "edit";
+    document.getElementById("admin-modal-title").textContent = `${editing ? "Edit" : "Add"} ${kind}`;
+    form.querySelector('[type="submit"]').textContent = editing ? "Save changes" : `Add ${kind}`;
+    document.getElementById(`add-${kind}-panel`).classList.add("show");
+    form.querySelector("h3").hidden = true;
     adminModalElement.addEventListener("shown.bs.modal", () => {
-        document.getElementById("new-tag-title").focus();
+        document.getElementById(`new-${kind}-title`).focus();
     }, { once: true });
     bootstrap.Modal.getOrCreateInstance(adminModalElement).show();
-}
+});

@@ -4,7 +4,7 @@ document.getElementById("upload-product-image")?.addEventListener("click", () =>
 productImageInput?.addEventListener("change", () => {
     document.getElementById("product-image-name").textContent = productImageInput.files[0]?.name || "";
 });
-document.querySelectorAll('.admin-demo-form:not(#create-tag-form)').forEach((form) => {
+document.querySelectorAll('.admin-demo-form:not(#create-tag-form):not(#create-category-form)').forEach((form) => {
     form.addEventListener("submit", (event) => {
         event.preventDefault();
         const category = form.querySelector('input[name="category"]');
@@ -147,6 +147,16 @@ tagSearch.addEventListener("input", () => {
 document.querySelectorAll('[data-picker="category"]').forEach((root) => {
     const getElement = (id) => document.getElementById(root.dataset.prefix + id);
 const categoryOptions = root.querySelectorAll("[data-category]");
+const selectedOption = [...categoryOptions].find((option) => option.dataset.category === getElement("category-value").value);
+if (selectedOption) {
+    getElement("category-summary").textContent = selectedOption.textContent;
+    categoryOptions.forEach((option) => {
+        option.classList.toggle("active", option === selectedOption);
+        if (option === selectedOption) option.setAttribute("aria-current", "true");
+        else option.removeAttribute("aria-current");
+    });
+}
+
 categoryOptions.forEach((option) => {
     option.addEventListener("click", () => {
         getElement("category-summary").textContent = option.textContent;
@@ -403,4 +413,34 @@ addSuccess?.addEventListener("keydown", (event) => {
     });
     panel.querySelector('[data-category=""]').click();
     panel.querySelector("#clear-tags").click();
+});
+
+// A top-layer popover escapes the scrollable modal without moving form controls.
+document.querySelectorAll('#admin-modal [data-picker="category"] .dropdown-menu').forEach((menu) => {
+    const trigger = menu.closest('[data-picker="category"]').querySelector('[data-bs-toggle="dropdown"]');
+    if (!menu.showPopover) return;
+    menu.setAttribute("popover", "manual");
+    menu.classList.remove("w-100");
+    menu.classList.add("category-floating-menu");
+    bootstrap.Dropdown.getOrCreateInstance(trigger, { display: "static" });
+    function positionMenu() {
+        if (!menu.matches(":popover-open")) return;
+        const rect = trigger.getBoundingClientRect();
+        const below = window.innerHeight - rect.bottom - 12;
+        const above = rect.top - 12;
+        const openBelow = below >= Math.min(menu.scrollHeight, 280) || below >= above;
+        menu.style.width = `${rect.width}px`;
+        menu.style.left = `${rect.left}px`;
+        menu.style.top = openBelow ? `${rect.bottom + 4}px` : "auto";
+        menu.style.bottom = openBelow ? "auto" : `${window.innerHeight - rect.top + 4}px`;
+        menu.style.maxHeight = `${Math.max(0, openBelow ? below : above)}px`;
+    }
+    trigger.addEventListener("shown.bs.dropdown", () => {
+        menu.showPopover();
+        positionMenu();
+    });
+    trigger.addEventListener("hidden.bs.dropdown", () => menu.hidePopover());
+    window.addEventListener("resize", positionMenu);
+    document.addEventListener("scroll", positionMenu, true);
+    adminModalElement.addEventListener("hide.bs.modal", () => bootstrap.Dropdown.getInstance(trigger).hide());
 });

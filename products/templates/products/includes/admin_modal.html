@@ -38,14 +38,15 @@
 
 
                         <div id="add-category-panel" class="collapse" data-bs-parent="#admin-forms">
-                            <form class="admin-demo-form pb-3" aria-label="Add category">
+                            <form id="create-category-form" class="admin-demo-form pb-3" aria-label="Add category" method="post" data-create-url="{% url 'products:create_category' %}" data-mode="{% if category_form.instance.pk %}edit{% else %}add{% endif %}" action="{% if category_form.instance.pk %}{% url 'products:edit_category' category_form.instance.pk %}{% else %}{% url 'products:create_category' %}{% endif %}">
+                                {% csrf_token %}
                                 <h3 class="fs-6 mb-3">Add category</h3>
                                 <label for="new-category-title" class="form-label small">Title</label>
-                                <input id="new-category-title" class="form-control form-control-sm mb-3" maxlength="100" required>
+                                <input id="new-category-title" name="title" value="{{ category_form.title.value|default_if_none:'' }}" class="form-control form-control-sm mb-3" maxlength="100" required>
                                 <label for="new-category-parent-category" class="form-label small">Parent category <span class="text-secondary">(optional)</span></label>
-                                <div class="mb-3">{% include "products/includes/category_picker.html" with prefix="new-category-parent-" category_placeholder="No parent" field_name="parent" as_dropdown=True %}</div>
+                                <div class="mb-3">{% include "products/includes/category_picker.html" with prefix="new-category-parent-" category_placeholder="No parent" field_name="parent" selected_parent=category_form.parent.value as_dropdown=True %}</div>
                                 <button type="submit" class="btn btn-primary btn-sm rounded-pill px-3">Add category</button>
-                                <p class="admin-form-status small text-secondary mt-2 mb-0" role="status"></p>
+                                <div class="admin-form-status small text-danger mt-2 mb-0" role="status">{{ category_form.title.errors }}{{ category_form.parent.errors }}{{ category_form.non_field_errors }}</div>
                             </form>
                         </div>
                         <div id="add-tag-panel" class="collapse" data-bs-parent="#admin-forms">
