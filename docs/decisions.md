@@ -136,6 +136,26 @@ Record meaningful project decisions here so the applicant and future agents can 
 
 **Supersedes / superseded by:** None.
 
+### DEC-007: Define Product with Django-managed tags
+
+- Date: 2026-11-22
+- Status: Accepted
+- Source / decision maker: User (required/nullable fields and automatic join table); Agent (field length and deletion behavior)
+
+**Context:** Implement Product after agreeing on its fields and changing the earlier preference for a custom ProductTag model to Django's automatic many-to-many table.
+
+**Options considered:** An explicit ProductTag model versus a Django-managed join table.
+
+**Decision:** Use an automatic ID, a required non-unique title (200 characters), a nullable/optional description, a required Category foreign key with `PROTECT`, an optional Asset image foreign key with `SET_NULL`, and an optional `ManyToManyField` to Tag. Django manages the join table with its own ID and unique product/tag pairs.
+
+**Rationale:** Matches the user's field requirements and delegates standard relationship management to Django.
+
+**Tradeoffs:** Descriptions may be NULL or empty. Image references are not restricted by asset type. The automatic join table has no custom metadata. Category deletion is blocked while referenced; image deletion preserves the product.
+
+**Implementation / verification:** Generated `0005_product.py` without applying it. Django system and migration consistency checks passed. Inspected generated SQL to confirm field nullability and the separate `products_product_tags` table with an ID and unique product/tag pairs. No TODO items added.
+
+**Supersedes / superseded by:** Replaces the earlier conversational preference for a custom ProductTag model.
+
 ## Entry template
 
 Copy this template into the Decisions section for each new entry:

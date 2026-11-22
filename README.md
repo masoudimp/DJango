@@ -4,7 +4,14 @@
 
 The `products` app currently defines `Tag` and `Category`. Each has an automatic
 integer primary key (`id`) and a required, unique `title` of up to 100 characters.
-The Product model and its relationships are not implemented yet.
+`Product` has an automatic ID, a required title (up to 200 characters, not unique),
+a nullable description, a required category, and an optional image referencing
+`Asset`. Categories referenced by products are protected from deletion; deleting
+an image asset clears the product's image reference. Image references are not yet
+restricted to a particular asset type.
+
+Products may have zero or more tags. Django manages the separate join table,
+including its ID and unique product/tag pairs, through `ManyToManyField`.
 
 `AssetType` has an automatic ID and a required, unique title (up to 100 characters).
 `Asset` has an automatic ID, a required, unique title (up to 200 characters), a
@@ -18,7 +25,7 @@ are deferred in the [user-requested TODO list](docs/todo.md).
 
 ## AI assistance
 
-Codex generated the initial `Tag`, `Category`, `AssetType`, and `Asset` models,
+Codex generated the initial `Tag`, `Category`, `AssetType`, `Asset`, and `Product` models,
 app configuration, and migrations, added the Category parent relation, and assisted
 with setup and documentation. Applicant review and personal modifications to the
 generated implementation are pending.
