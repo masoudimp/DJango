@@ -290,6 +290,50 @@ Record meaningful project decisions here so the applicant and future agents can 
 
 **Implementation / verification:** All 15 Django tests passed, covering edits, validation, unchanged titles, product associations, missing records, POST restrictions, and CSRF. JavaScript syntax check passed. No TODOs added.
 
+### DEC-016: Enable Django admin for assignment models
+
+- Date: 2026-11-22
+- Status: Accepted
+- Source / decision maker: Employer requirement; user requested implementation
+
+**Decision:** Register Product, Category, and Tag with Django admin. Reuse their
+ModelForms so category cycle validation applies to both admin and custom forms.
+Expose product title, description, category, and tags, with tag selection,
+list search, and filters. Preserve the user's removal of image inputs.
+
+**Rationale / tradeoffs:** Use Django's existing staff permissions and admin UI
+without changing the custom management page. No working-data mutations or account
+creation are needed to register models. The user must create a superuser interactively.
+Existing direct/custom-UI data entry does not satisfy admin-based population.
+
+**Implementation / verification:** Added products/admin.py and admin integration
+tests for pages, related-data creation/editing, cycle rejection, and staff access.
+All 39 Django tests passed; system checks passed; no migration changes detected.
+README documents admin setup and remaining sample-entry requirements.
+
+### DEC-017: Replace custom management with Django admin
+
+- Date: 2026-11-22
+- Status: Accepted
+- Source / decision maker: User
+
+**Decision:** Point the header Admin link to `admin:index`. Remove `/manage/`,
+custom create/edit/delete endpoints, management templates/JavaScript, and related
+modal styles. Retain the dashboard, filtering, models, migrations, and existing data.
+Use Django's generated Product/Tag forms; retain CategoryForm for cycle validation.
+
+**Rationale / tradeoffs:** Django admin already provides the assignment's data
+management functionality and staff permissions. Old custom CRUD URLs now return
+404. Historical custom-UI tests are replaced by admin/navigation tests; filtering
+tests remain. README now describes the current application instead of previews.
+
+**Implementation / verification:** Django tests cover admin CRUD, protected deletion,
+category cycles, removed routes, dashboard navigation, and filters. No working
+records or accounts are changed. Admin sample entry remains outstanding.
+
+**Supersedes:** DEC-011 through DEC-015's custom management UI and CRUD choices;
+DEC-016's registration remains active, with the redundant forms removed.
+
 ## Entry template
 
 Copy this template into the Decisions section for each new entry:

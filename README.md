@@ -1,121 +1,99 @@
-# DJango
+# Product catalog assignment
 
-## Current models
+A Django product dashboard with description/name search, category filtering, and
+multiple-tag filtering. Products, categories, and tags are managed through the
+built-in Django admin. The dashboard header's **Admin** link opens `/admin/`.
+The former custom `/manage/` page and its mutation endpoints have been removed.
 
-### Create a tag
+## Run locally
 
-The existing `/tags/create/` endpoint and original tag form save to SQLite using a normal Django POST
-and redirects back with a success message. Empty, whitespace-only, overlong (more
-than 100 characters), and duplicate titles are rejected. Titles are trimmed; the
-existing database uniqueness rule is case-sensitive on SQLite.
-
-The tag pickers load saved tags after the page reloads. Category and product
-creation remain static previews. Submitting the tag form reloads the whole page,
-so unfinished entries in other preview forms are not retained. This local demo
-endpoint uses CSRF protection but does not yet require login.
-
-### Management UI preview
-
-Open `/manage/` directly. Choose Products, Categories,
-or Tags to see tables with row-level Edit/Delete buttons and an Add button.
-Tags are read from SQLite, ordered by title; an empty table shows “No tags found.”
-Products and categories still use sample rows.
-Add opens the relevant form in a modal; Edit opens it prefilled with the sample row.
-Delete opens a confirmation dialog. For tags, confirming submits a CSRF-protected
-POST, deletes the tag and its product associations, and returns to the Tags tab
-with a success message. Products and other tags are preserved. Missing tags return
-404 and GET requests cannot delete. Like creation, this local-demo endpoint does
-not yet require login.
-
-Add tag saves through the existing POST endpoint, returns to the Tags table, and
-shows a success modal. Invalid titles reopen the form with the entered value and
-validation error. Tag editing saves through a CSRF-protected POST using the same TagForm and modal.
-It preserves the tag ID and product links, rejects invalid or duplicate titles,
-and returns to the Tags table with a success modal. Only product/category actions
-remain previews. Codex implemented the tag edit endpoint, form integration, and tests.
-No real tags were deleted during development checks; tests use a separate database.
-
-The existing category/tag pickers, modal artwork, discard confirmation, and header
-are reused. Codex connected the management Add tag form to the existing backend. `/admin/` remains
-the separate built-in Django admin URL.
-
-The assignment still requires sample data to be entered through Django admin;
-this custom form does not replace that requirement. No sample data was populated.
-
-Run the focused tests with `.venv/bin/python manage.py test products`.
-
-The `products` app currently defines `Tag` and `Category`. Each has an automatic
-integer primary key (`id`) and a required, unique `title` of up to 100 characters.
-`Product` has an automatic ID, a required title (up to 200 characters, not unique),
-a nullable description, a required category, and an optional image referencing
-`Asset`. Categories referenced by products are protected from deletion; deleting
-an image asset clears the product's image reference. Image references are not yet
-restricted to a particular asset type.
-
-Products may have zero or more tags. Django manages the separate join table,
-including its ID and unique product/tag pairs, through `ManyToManyField`.
-
-`AssetType` has an automatic ID and a required, unique title (up to 100 characters).
-`Asset` has an automatic ID, a required, unique title (up to 200 characters), a
-required URL (up to 200 characters), and a required asset type. Asset types in use
-cannot be deleted. Assets store URLs only; file uploads are not implemented.
-
-Category has an optional parent category (`parent_id` in the database); a null parent
-denotes a root category. Children are accessible through `category.children`.
-Deleting a category with children is protected. Self-parent and cycle validation
-are deferred in the [user-requested TODO list](docs/todo.md).
-
-## AI assistance
-
-Codex also integrated Bootstrap and generated the shared base template, static
-dashboard view and templates, styling, and product image fallback.
-Codex implemented the tag ModelForm, POST view, template integration, and tests.
-Codex also created the management UI preview and extracted the shared header and
-form modal templates.
-Codex implemented tag deletion, its confirmation-form integration, and tests.
-
-Codex generated the initial `Tag`, `Category`, `AssetType`, `Asset`, and `Product` models,
-app configuration, and migrations, added the Category parent relation, and assisted
-with setup and documentation. Applicant review and personal modifications to the
-generated implementation are pending.
-
-## Bootstrap and templates
-
-Bootstrap 5.3.9 compiled CSS and bundled JavaScript (including Popper) are stored
-locally under `products/static/products/vendor/bootstrap/`, with their license.
-Source: https://cdn.jsdelivr.net/npm/bootstrap@5.3.9/.
-No npm installation, front-end build, or runtime CDN access is required.
-
-New templates can use `{% extends "products/base.html" %}` and override the
-`title`, `content`, `extra_css`, and `extra_js` blocks.
-
-Run `.venv/bin/python manage.py runserver` and open http://127.0.0.1:8000/ for the
-dashboard. The six product cards are static demo content, not database
-records. Category options remain static; tag options come from SQLite and support
-clearing selections. Both panels use Bootstrap Collapse to expand inline in the sidebar and include case-insensitive
-search over their sample options. Category search reveals matching branches and
-their ancestors; clearing the search restores previous expansion states. Tag
-search preserves existing selections. These selections do not filter the
-cards yet, and the search input remains disabled. The dashboard queries saved tags.
-
-The supplied placeholder image was moved to
-`products/static/products/assets/images/image-not-available.jpg`. The reusable
-`products/includes/product_card.html` template displays it when `product.image`
-or its URL is absent/empty; otherwise it displays `product.image.url`.
-
-## Database
-
-The project uses SQLite, configured in `config/settings.py`. No separate database
-server is required. Django uses `db.sqlite3` in the project root; this local database
-file is excluded from Git.
-
-With the virtual environment and Django installed, create the database tables with:
+The existing environment uses Python 3.15.2 and Django 6.1.3. With Python and
+Django installed in the project's virtual environment:
 
 ```sh
 .venv/bin/python manage.py migrate
+.venv/bin/python manage.py createsuperuser
+.venv/bin/python manage.py runserver
 ```
 
-See [the decision log](docs/decisions.md) for the rationale (DEC-002).
+Open http://127.0.0.1:8000/ for the dashboard and
+http://127.0.0.1:8000/admin/ for management. Create your administrator account
+interactively; do not commit credentials. SQLite stores local data in
+`db.sqlite3`, which is excluded from Git. A fresh database starts empty.
+Dependency installation/packaging and a clean-environment setup check remain
+outstanding before submission.
 
-The header Admin button opens `/manage/`; only the legacy dashboard Admin modal has been removed.
-Management forms remain available on `/manage/`; tag submissions return there.
+Bootstrap CSS and bundled JavaScript are served locally from
+`products/static/products/vendor/bootstrap/`. No frontend build is needed.
+
+## Django admin and sample data
+
+Create categories, optionally choosing a parent; create tags; then create
+products with a title and category. Description and tags are optional in the
+model. The product admin offers a multiple-tag selector, search, and list filters.
+No image input or upload is exposed. Products without images show the supplied
+placeholder. Django admin requires a staff account with appropriate permissions.
+
+The assignment requires entering at least 5 categories, 10 tags, and 20 products
+through Django admin, with varied descriptions and tag combinations. Existing
+sample records were entered using the former custom UI/direct database operations;
+this does not satisfy the admin-entry requirement. Admin-based entry and a
+reproducible sample-data delivery process remain outstanding. Tests do not count
+as working-database sample entry.
+
+## Models and validation
+
+- A product belongs to one category and may have multiple tags.
+- Category and tag titles are unique; product titles need not be unique.
+- Categories may have a parent. The category admin form rejects self-parenting
+  and hierarchy cycles; direct ORM writes do not run this form validation.
+- Categories with products or children are protected from deletion.
+- Deleting a product preserves its category and tags. Deleting a tag removes
+  its product associations, not the products.
+- Existing Asset and AssetType models store asset URLs. The optional product
+  image relation is retained; deleting an asset clears its product references.
+
+## Dashboard filters
+
+`ProductFilterRequest` in `products/dtos.py` accepts nullable `categoryId`,
+`tagIds`, and `search`. The GET endpoint is `/products/filter/`, for example:
+`/products/filter/?categoryId=1&tagIds=2&tagIds=3&search=indoor`.
+Omitted or empty values mean no filter. Malformed IDs return HTTP 400.
+
+`products/filters.py` builds a queryset:
+
+- Category includes the selected category and its descendants.
+- Tags match **any** selected tag; duplicate products are removed.
+- Search performs case-insensitive contains matching on title or description.
+- Different filters combine with AND; no filters returns all products.
+
+Related category/image data is joined and tags are prefetched. The browser
+waits 300 ms after typing, sends category/tag changes immediately, cancels stale
+requests, and replaces only the product cards. Clear resets all filters and
+sends one request. Filter selections are not persisted across page reloads.
+
+## Verification
+
+```sh
+.venv/bin/python manage.py check
+.venv/bin/python manage.py test
+node --test products/js_tests/filters.test.cjs
+```
+
+Node is only needed for JavaScript tests. Django tests use an isolated database.
+Tests cover filter combinations, DTO parsing, admin entry/editing and permissions,
+category cycle validation, deletion protection, and dashboard navigation.
+JavaScript tests cover debounce, clearing, cancellation, and request failures.
+Visual browser verification and a fresh-environment setup check remain outstanding.
+
+## AI assistance
+
+Codex generated the initial models and migrations, dashboard templates and styling,
+filter DTO/query logic, JavaScript interactions, tests, and Django admin integration.
+Codex also built, then removed at the applicant's request, a custom CRUD panel.
+AI-assisted sample insertion used direct database access rather than Django admin.
+
+Applicant review, understanding, and significant personal contributions must be
+completed and accurately documented before submission, as required by the
+assignment's AI policy. Further agent-generated changes are not evidence of
+personal contributions. Historical decisions are recorded in `docs/decisions.md`.
