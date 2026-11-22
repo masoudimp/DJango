@@ -334,6 +334,105 @@ records or accounts are changed. Admin sample entry remains outstanding.
 **Supersedes:** DEC-011 through DEC-015's custom management UI and CRUD choices;
 DEC-016's registration remains active, with the redundant forms removed.
 
+### DEC-018: Fill missing sample product descriptions
+
+- Date: 2026-11-22
+- Status: Accepted
+- Source / decision maker: User
+
+**Decision:** Add English sample catalog descriptions to the 19 products with
+blank descriptions, preserving the existing description. Copy is based on the
+supplied product names, not verified manufacturer specifications.
+
+**Assignment conflict / warning:** Before updating, the user was informed that
+direct database updates do not replace the required Django-admin data entry.
+Admin entry remains the compliant workflow for fulfilling that requirement.
+
+**Verification:** Updated inside one transaction; verified all 20 products have
+nonblank descriptions and the existing description is unchanged. No schema changes.
+
+### DEC-019: Recreate only one product through Django admin
+
+- Date: 2026-11-22
+- Status: Accepted
+- Source / decision maker: User explicitly limited replacement to one record
+
+**Decision:** After backing up the catalog, delete Flame Resistant Safety Jacket
+(ID 20) and recreate it through the actual Django admin browser forms as ID 21.
+Preserve its description, Safety Equipment category, and Fire Resistant and
+Industrial Grade tags. Do not recreate other records.
+
+**Verification:** Browser showed deletion and creation success. Read-only checks
+confirmed an admin addition log, 20 total products, and identical catalog content
+against the pre-operation backup (ignoring product primary keys). This demonstrates
+one admin entry, not completion of the full admin-population requirement.
+
+### DEC-020: Pin dependencies and verify a clean local installation
+
+- Date: 2026-11-22
+- Status: Accepted
+- Source / decision maker: User
+
+**Decision:** Add requirements.txt with Django 6.1.3, asgiref 3.13.0, and sqlparse
+0.6.1, matching the working environment. Document clone, venv, installation,
+migrations, superuser creation, server startup, configuration, and verification.
+
+**Verification:** Copied the current local source to a temporary directory excluding
+.git, .venv, and db.sqlite3. Created a new venv with Python 3.15.2 and downloaded
+packages from PyPI without cache. pip check, all migrations, Django system checks,
+and migration consistency checks passed. All 16 Django tests and 4 JavaScript tests
+passed. Started the isolated server on port 8018; dashboard, filter fragment,
+admin login, dashboard JS, and Bootstrap CSS returned HTTP 200. The working
+catalog database was not changed. This is not a published-repository clone test;
+Windows/other Python versions and full visual verification remain untested.
+
+### DEC-021: Verify dashboard and admin in desktop Chrome
+
+- Date: 2026-11-22
+- Status: Accepted
+- Source / decision maker: User requested manual browser verification
+
+**Decision:** Exercise the actual browser interface. Use the original dashboard
+for read-only filter checks and a copied project/database on port 8019 for
+admin mutations. Obtain confirmation before deleting the temporary test records.
+
+**Verification:** Description/name search, combined filters, empty results,
+parent/leaf categories, ANY-tag matching without duplicates, deselection, Clear,
+filtered product details, and Admin opening in a separate tab passed. Created
+and edited a temporary category, tag, and product. Verified tag clearing,
+self-parent validation, and protected category deletion. After confirmation,
+deleted all three temporary records through admin; success messages and restored
+counts were observed. Compared all catalog rows and product/tag associations
+between the copied and original databases: identical after cleanup. Original
+20 products, 13 categories, and 10 tags were untouched. No functional fix was
+required. Coverage is desktop Chrome, not mobile or other browsers.
+
+### DEC-022: Populate the full sample catalog through Django admin
+
+- Date: 2026-11-22
+- Status: Accepted
+- Source / decision maker: User requested completing the admin-entry requirement
+
+**Decision:** Preserve the old database and populate a fresh migrated database
+through the actual Django admin browser UI: 13 categories with parent relationships,
+10 tags, and 20 products with descriptions and two tags each. Only existing login
+accounts/permissions/sessions were copied for access; no catalog records were
+seeded into the fresh database. Codex operated the forms on the user's behalf.
+
+**Verification:** Browser Save/Add-another submissions created all 43 records.
+Read-only comparison confirmed identical category ancestry, tag names, product
+names/descriptions/categories, and 40 product/tag links against the old catalog.
+Every record has a corresponding admin ADDITION log (13/10/20). After verifying
+the live catalog had not changed, switched the working database to this verified
+copy. SQLite integrity and foreign-key checks passed. Existing users and their
+permissions were preserved. Record IDs may change. Original database snapshots
+remain at /private/tmp/django-admin-entry-ckfbz2jh/original.sqlite3 and
+/private/tmp/django-admin-entry-ckfbz2jh/before-switch.sqlite3 (local only; not committed).
+
+**Supersedes:** DEC-018/019's incomplete admin-population status. Full admin-based
+sample entry is now complete; reviewer data delivery is a separate remaining task.
+This does not certify applicant personal contributions under the AI policy.
+
 ## Entry template
 
 Copy this template into the Decisions section for each new entry:
