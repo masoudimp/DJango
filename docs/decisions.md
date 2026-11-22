@@ -36,6 +36,26 @@ Record meaningful project decisions here so the applicant and future agents can 
 
 **Supersedes / superseded by:** None.
 
+### DEC-002: Use SQLite
+
+- Date: 2026-11-22
+- Status: Accepted
+- Source / decision maker: User
+
+**Context:** Select the database for the take-home project. The assignment does not require a specific database engine.
+
+**Options considered:** SQLite, or a separate database server such as PostgreSQL.
+
+**Decision:** Use SQLite through Django ORM, with the database file at `BASE_DIR / 'db.sqlite3'`.
+
+**Rationale:** SQLite keeps local setup simple and requires no separate database server, which fits this small assignment.
+
+**Tradeoffs:** SQLite offers less write concurrency than a server-based database; this is acceptable for the intended local demonstration.
+
+**Implementation / verification:** Confirmed that [settings.py](../config/settings.py) already configures `django.db.backends.sqlite3`. No settings change was needed. `manage.py check` passed. Database migrations and sample-data population were not performed as part of this decision.
+
+**Supersedes / superseded by:** None.
+
 ## Entry template
 
 Copy this template into the Decisions section for each new entry:
