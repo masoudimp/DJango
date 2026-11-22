@@ -1,4 +1,4 @@
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib import messages
 from django.db import IntegrityError, transaction
 from django.views.decorators.http import require_POST
@@ -20,6 +20,14 @@ def create_tag(request):
             messages.success(request, "Tag added successfully")
             return redirect("products:dashboard")
     return dashboard(request, tag_form=form)
+
+
+@require_POST
+def delete_tag(request, pk):
+    tag = get_object_or_404(Tag, pk=pk)
+    tag.delete()
+    messages.success(request, "Tag deleted successfully.")
+    return redirect("/manage/?section=tag")
 
 
 def dashboard(request, tag_form=None):
@@ -58,4 +66,5 @@ def management(request):
         "sections": sections,
         "demo_tags": ["Cordless", "Compact", "Lightweight", "Heavy duty", "Professional"],
         "management": True,
+        "active_section": request.GET.get("section", "product"),
     })

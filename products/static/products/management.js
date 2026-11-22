@@ -60,15 +60,26 @@ document.querySelectorAll("[data-manage-edit]").forEach((button) => {
 adminModalElement.addEventListener("hidden.bs.modal", () => managementTrigger?.focus());
 
 const deletePreview = document.getElementById("delete-preview");
+const deleteForm = document.getElementById("delete-form");
 document.querySelectorAll("[data-manage-delete]").forEach((button) => {
     button.addEventListener("click", () => {
         managementTrigger = button;
+        const deleteUrl = button.closest("tr").dataset.deleteUrl;
+        deleteForm.dataset.realDelete = deleteUrl ? "true" : "false";
+        deleteForm.action = deleteUrl || "";
         document.getElementById("delete-preview-text").textContent = `Do you want to delete “${button.closest("tr").dataset.title}”?`;
-        document.getElementById("delete-preview-status").textContent = "Preview only — no records will be deleted.";
+        document.getElementById("delete-preview-status").textContent = deleteUrl
+            ? "This will delete the tag and remove it from any linked products."
+            : "Preview only — no records will be deleted.";
         bootstrap.Modal.getOrCreateInstance(deletePreview).show();
     });
 });
-document.getElementById("confirm-preview-delete").addEventListener("click", () => {
+deleteForm.addEventListener("submit", (event) => {
+    if (deleteForm.dataset.realDelete === "true") {
+        document.getElementById("confirm-preview-delete").disabled = true;
+        return;
+    }
+    event.preventDefault();
     document.getElementById("delete-preview-status").textContent = "Delete preview complete. No data was changed.";
 });
 deletePreview.addEventListener("hidden.bs.modal", () => managementTrigger?.focus());

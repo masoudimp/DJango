@@ -21,9 +21,14 @@ or Tags to see tables with row-level Edit/Delete buttons and an Add button.
 Tags are read from SQLite, ordered by title; an empty table shows “No tags found.”
 Products and categories still use sample rows.
 Add opens the relevant form in a modal; Edit opens it prefilled with the sample row.
-Delete opens a confirmation preview. These new management forms are deliberately
-UI-only: they do not call the real tag endpoint, save data, or delete records.
-The tables remain sample data after previewing an operation.
+Delete opens a confirmation dialog. For tags, confirming submits a CSRF-protected
+POST, deletes the tag and its product associations, and returns to the Tags tab
+with a success message. Products and other tags are preserved. Missing tags return
+404 and GET requests cannot delete. Like creation, this local-demo endpoint does
+not yet require login.
+
+Product/category deletion and all Add/Edit actions on this page remain previews.
+No real tags were deleted during development checks; tests use a separate database.
 
 The existing category/tag pickers, modal artwork, discard confirmation, and header
 are reused. The original tag backend remains implemented and tested, but connecting
@@ -63,6 +68,7 @@ dashboard view and templates, styling, and product image fallback.
 Codex implemented the tag ModelForm, POST view, template integration, and tests.
 Codex also created the management UI preview and extracted the shared header and
 form modal templates.
+Codex implemented tag deletion, its confirmation-form integration, and tests.
 
 Codex generated the initial `Tag`, `Category`, `AssetType`, `Asset`, and `Product` models,
 app configuration, and migrations, added the Category parent relation, and assisted

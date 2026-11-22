@@ -236,6 +236,26 @@ Record meaningful project decisions here so the applicant and future agents can 
 
 **Supersedes / superseded by:** Replaces the header Admin button's modal-opening behavior. DEC-010's tag persistence implementation remains in place.
 
+### DEC-012: Delete database tags after confirmation
+
+- Date: 2026-11-22
+- Status: Accepted
+- Source / decision maker: User (deletion); Agent (normal form POST)
+
+**Context:** Make deletion functional for the database-backed Tags table.
+
+**Decision:** Submit a CSRF-protected POST after confirmation, find the tag by ID, delete it, and redirect to the Tags tab with a success message. Keep product/category deletion as preview actions because their rows are static samples.
+
+**Options considered:** Fetch-based deletion or standard Django POST/redirect.
+
+**Rationale:** A normal form submission keeps the implementation short and beginner-friendly.
+
+**Tradeoffs:** Deletion removes product/tag associations but preserves products. The local demo still has no authentication requirement. Missing tags return 404.
+
+**Implementation / verification:** All nine Django tests passed, including deletion, method restrictions, CSRF, missing records, and preservation of related products/other tags. No working-database records were deleted. No TODOs added.
+
+**Supersedes / superseded by:** Replaces DEC-011's preview-only deletion for tags only.
+
 ## Entry template
 
 Copy this template into the Decisions section for each new entry:

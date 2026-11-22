@@ -1,7 +1,7 @@
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from .models import Tag
+from .models import Category, Product, Tag
 
 
 class CreateTagTests(TestCase):
@@ -34,3 +34,37 @@ class CreateTagTests(TestCase):
         client.get(reverse("products:dashboard"))
         token = client.cookies["csrftoken"].value
         self.assertEqual(client.post(url, {"title": "Tools", "csrfmiddlewaretoken": token}).status_code, 302)
+
+
+class DeleteTagTests(TestCase):
+    def setUp(self):
+        self.tag = Tag.objects.create(title="Cordless")
+        self.url = reverse("products:delete_tag", args=[self.tag.pk])
+
+    def test_delete_removes_tag_but_keeps_product_and_other_tags(self):
+        category = Category.objects.create(title="Tools")
+        product = Product.objects.create(title="Drill", category=category)
+        other_tag = Tag.objects.create(title="Compact")
+        product.tags.add(self.tag, other_tag)
+        response = self.client.post(self.url, follow=True)
+        self.assertContains(response, "Tag deleted successfully.")
+        self.assertFalse(Tag.objects.filter(pk=self.tag.pk).exists())
+        self.assertTrue(Product.objects.filter(pk=product.pk).exists())
+        self.assertEqual(list(product.tags.all()), [other_tag])
+
+    def test_get_does_not_delete(self):
+        self.assertEqual(self.client.get(self.url).status_code, 405)
+        self.assertTrue(Tag.objects.filter(pk=self.tag.pk).exists())
+
+    def test_missing_tag_returns_404(self):
+        self.tag.delete()
+        self.assertEqual(self.client.post(self.url).status_code, 404)
+
+    def test_delete_requires_csrf(self):
+        client = Client(enforce_csrf_checks=True)
+        self.assertEqual(client.post(self.url).status_code, 403)
+        self.assertTrue(Tag.objects.filter(pk=self.tag.pk).exists())
+        client.get(reverse("products:management"))
+        token = client.cookies["csrftoken"].value
+        self.assertEqual(client.post(self.url, {"csrfmiddlewaretoken": token}).status_code, 302)
+        self.assertFalse(Tag.objects.filter(pk=self.tag.pk).exists())
