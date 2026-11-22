@@ -5,6 +5,25 @@ from .models import Category, Product, Tag
 
 
 class CreateTagTests(TestCase):
+    def test_management_create_returns_to_tags_with_success_modal(self):
+        response = self.client.post(reverse("products:create_tag"), {
+            "title": "Compact", "source": "management",
+        }, follow=True)
+        self.assertRedirects(response, "/manage/?section=tag")
+        self.assertEqual(Tag.objects.get().title, "Compact")
+        self.assertContains(response, 'id="management-success"')
+        self.assertContains(response, "Tag added successfully")
+
+    def test_management_duplicate_reopens_form_with_error(self):
+        Tag.objects.create(title="Compact")
+        response = self.client.post(reverse("products:create_tag"), {
+            "title": "Compact", "source": "management",
+        })
+        self.assertContains(response, 'id="management-tag-invalid"', status_code=400)
+        self.assertContains(response, 'value="Compact"', status_code=400)
+        self.assertContains(response, "already exists", status_code=400)
+        self.assertEqual(Tag.objects.count(), 1)
+
     def test_create_and_show_tag(self):
         response = self.client.post(reverse("products:create_tag"), {"title": "  Cordless  "}, follow=True)
         self.assertEqual(Tag.objects.get().title, "Cordless")

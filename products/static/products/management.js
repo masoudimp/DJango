@@ -5,8 +5,9 @@ function openManagementForm(kind, row, trigger) {
     const editing = Boolean(row);
     const action = editing ? "Edit" : "Add";
 
-    // These forms only preview changes; they never send a request.
+    // Keep hidden request fields while clearing the visible form.
     adminFields.forEach((field) => {
+        if (["csrfmiddlewaretoken", "source"].includes(field.name)) return;
         if (field.type === "checkbox") field.checked = false;
         else field.value = "";
         field.dispatchEvent(new Event("input", { bubbles: true }));
@@ -83,3 +84,29 @@ deleteForm.addEventListener("submit", (event) => {
     document.getElementById("delete-preview-status").textContent = "Delete preview complete. No data was changed.";
 });
 deletePreview.addEventListener("hidden.bs.modal", () => managementTrigger?.focus());
+
+const managementSuccess = document.getElementById("management-success");
+if (managementSuccess) {
+    bootstrap.Modal.getOrCreateInstance(managementSuccess).show();
+    managementSuccess.addEventListener("hidden.bs.modal", () => {
+        document.getElementById("tag-tab").focus();
+    });
+}
+
+const createTagForm = document.getElementById("create-tag-form");
+createTagForm.addEventListener("submit", (event) => {
+    if (createTagForm.dataset.mode === "edit") {
+        event.preventDefault();
+        showAddSuccess(createTagForm);
+    }
+});
+
+if (document.getElementById("management-tag-invalid")) {
+    document.getElementById("admin-modal-title").textContent = "Add tag";
+    document.getElementById("add-tag-panel").classList.add("show");
+    createTagForm.querySelector("h3").hidden = true;
+    adminModalElement.addEventListener("shown.bs.modal", () => {
+        document.getElementById("new-tag-title").focus();
+    }, { once: true });
+    bootstrap.Modal.getOrCreateInstance(adminModalElement).show();
+}

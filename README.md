@@ -27,12 +27,13 @@ with a success message. Products and other tags are preserved. Missing tags retu
 404 and GET requests cannot delete. Like creation, this local-demo endpoint does
 not yet require login.
 
-Product/category deletion and all Add/Edit actions on this page remain previews.
+Add tag saves through the existing POST endpoint, returns to the Tags table, and
+shows a success modal. Invalid titles reopen the form with the entered value and
+validation error. Product/category actions and tag editing remain previews.
 No real tags were deleted during development checks; tests use a separate database.
 
 The existing category/tag pickers, modal artwork, discard confirmation, and header
-are reused. The original tag backend remains implemented and tested, but connecting
-it to this new management page is outside this UI-only change. `/admin/` remains
+are reused. Codex connected the management Add tag form to the existing backend. `/admin/` remains
 the separate built-in Django admin URL.
 
 The assignment still requires sample data to be entered through Django admin;

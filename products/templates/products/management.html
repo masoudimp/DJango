@@ -4,7 +4,20 @@
 {% block extra_css %}<link rel="stylesheet" href="{% static 'products/dashboard.css' %}">{% endblock %}
 {% block content %}
 {% include "products/includes/header.html" %}
-{% for message in messages %}<div class="alert alert-success" role="status">{{ message }}</div>{% endfor %}
+{% if tag_form %}<span id="management-tag-invalid" hidden></span>{% endif %}
+{% if messages %}
+<div class="modal fade" id="management-success" tabindex="-1" aria-labelledby="management-success-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 rounded-4 shadow-lg p-4 text-center">
+            <div class="text-success mb-3" aria-hidden="true">
+                <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>
+            </div>
+            <h2 id="management-success-title" class="fs-5 fw-semibold mb-4">{% for message in messages %}{{ message }}{% endfor %}</h2>
+            <button type="button" class="btn btn-success btn-sm rounded-pill px-4 align-self-center" data-bs-dismiss="modal">Done</button>
+        </div>
+    </div>
+</div>
+{% endif %}
 <div class="row g-4">
     <aside class="col-12 col-lg-3 col-xl-2">
         <nav class="nav nav-pills flex-column gap-2 bg-white rounded-4 p-3 shadow-sm" aria-label="Admin sections" role="tablist" aria-orientation="vertical">
@@ -15,7 +28,7 @@
         </nav>
     </aside>
     <div class="col-12 col-lg-9 col-xl-10">
-        <p class="small text-secondary mb-3">Tags are loaded from the database and can be deleted. Other actions and records are previews.</p>
+        <p class="small text-secondary mb-3">Tags can be added and deleted in the database. Other actions and records are previews.</p>
         <div class="tab-content">
             {% for section in sections %}
             <section class="tab-pane fade {% if section.key == active_section %}show active{% endif %}" id="{{ section.key }}-table" role="tabpanel" aria-labelledby="{{ section.key }}-tab" tabindex="0">

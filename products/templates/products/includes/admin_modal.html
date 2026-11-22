@@ -53,8 +53,9 @@
                             </form>
                         </div>
                         <div id="add-tag-panel" class="collapse" data-bs-parent="#admin-forms">
-                            <form id="{% if management %}preview-tag-form{% else %}create-tag-form{% endif %}" class="admin-demo-form pb-3" aria-label="Add tag" {% if not management %}method="post" action="{% url 'products:create_tag' %}"{% endif %}>
+                            <form id="create-tag-form" class="admin-demo-form pb-3" aria-label="Add tag" method="post" action="{% url 'products:create_tag' %}">
                                 {% csrf_token %}
+                                {% if management %}<input type="hidden" name="source" value="management">{% endif %}
                                 <h3 class="fs-6 mb-3">Add tag</h3>
                                 <label for="new-tag-title" class="form-label small">Title</label>
                                 <input id="new-tag-title" name="title" value="{{ tag_form.title.value|default_if_none:'' }}" class="form-control form-control-sm mb-3" maxlength="100" aria-describedby="tag-form-status" required>

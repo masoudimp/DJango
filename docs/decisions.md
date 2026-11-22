@@ -256,6 +256,18 @@ Record meaningful project decisions here so the applicant and future agents can 
 
 **Supersedes / superseded by:** Replaces DEC-011's preview-only deletion for tags only.
 
+### DEC-013: Connect management Add tag to the existing backend
+
+- Date: 2026-11-22
+- Status: Accepted
+- Source / decision maker: User
+
+**Decision:** Reuse TagForm and the existing POST endpoint for management Add tag. A fixed source field returns successful requests to the Tags table and success modal. Invalid requests reopen the form with validation errors and the entered title. Preserve CSRF fields when resetting the modal.
+
+**Rationale / tradeoffs:** Standard POST keeps the code simple. Tag editing and product/category actions remain previews.
+
+**Implementation / verification:** Eleven Django tests pass, including management creation and duplicate validation. JavaScript syntax check passed. No TODOs added.
+
 ## Entry template
 
 Copy this template into the Decisions section for each new entry:

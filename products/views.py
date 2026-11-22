@@ -9,6 +9,7 @@ from .models import Tag
 
 @require_POST
 def create_tag(request):
+    from_management = request.POST.get("source") == "management"
     form = TagForm(request.POST)
     if form.is_valid():
         try:
@@ -18,7 +19,11 @@ def create_tag(request):
             form.add_error("title", "A tag with this title already exists.")
         else:
             messages.success(request, "Tag added successfully")
+            if from_management:
+                return redirect("/manage/?section=tag")
             return redirect("products:dashboard")
+    if from_management:
+        return management(request, tag_form=form)
     return dashboard(request, tag_form=form)
 
 
@@ -47,7 +52,7 @@ def dashboard(request, tag_form=None):
     }, status=400 if tag_form is not None else 200)
 
 
-def management(request):
+def management(request, tag_form=None):
     # Products and categories are samples; tags come from the database.
     sections = [
         {"key": "product", "title": "Products", "detail_label": "Category", "rows": [
@@ -66,5 +71,6 @@ def management(request):
         "sections": sections,
         "demo_tags": ["Cordless", "Compact", "Lightweight", "Heavy duty", "Professional"],
         "management": True,
-        "active_section": request.GET.get("section", "product"),
-    })
+        "active_section": "tag" if tag_form is not None else request.GET.get("section", "product"),
+        "tag_form": tag_form,
+    }, status=400 if tag_form is not None else 200)
