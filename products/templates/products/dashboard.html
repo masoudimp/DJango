@@ -1,0 +1,179 @@
+{% extends "products/base.html" %}
+{% load static %}
+{% block title %}Dashboard | Product Catalog{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'products/dashboard.css' %}">
+{% endblock %}
+{% block content %}
+<header class="d-flex align-items-center justify-content-between gap-3 border-bottom pb-3 mb-4">
+    <div class="d-flex align-items-center gap-2">
+    <a href="{% url 'products:dashboard' %}" class="brand text-decoration-none">
+        <span class="brand-monogram" aria-hidden="true">MI</span>
+        <span class="brand-copy">
+            <span class="brand-label">Assignment</span>
+            <span class="brand-name">Masoud Imanpour<span class="brand-dot">.</span></span>
+        </span>
+    </a>
+    <button type="button" id="contact-info" class="contact-info-button" aria-label="Show Masoud Imanpour's contact information" aria-expanded="false">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7v2"/></svg>
+    </button>
+    </div>
+    <template id="contact-content">
+        <div class="contact-details">
+            <div class="contact-row">
+                <span class="contact-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 7 8 6 8-6"/></svg></span>
+                <div><span class="contact-label">Email</span><span>imanpour@outlook.com</span></div>
+            </div>
+            <div class="contact-row">
+                <span class="contact-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z"/><circle cx="12" cy="10" r="2.5"/></svg></span>
+                <div><span class="contact-label">Location</span><span>Vancouver, BC</span></div>
+            </div>
+            <div class="contact-row">
+                <span class="contact-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12a20 20 0 0 0 18 0M12 11v4"/></svg></span>
+                <div><span class="contact-label">Current position</span><span>Senior Software Developer</span></div>
+            </div>
+        </div>
+    </template>
+    <div class="d-flex align-items-center gap-3">
+        <span class="badge rounded-pill text-bg-primary px-3 py-2">Dashboard</span>
+        <button type="button" class="btn badge rounded-pill border-0 px-3 py-2 admin-button" data-bs-toggle="modal" data-bs-target="#admin-modal">Admin</button>
+    </div>
+</header>
+<section aria-label="Products" class="catalog-layout">
+    <fieldset aria-label="Product filters" class="filter-panel card border-0 shadow-sm p-3 mb-0">
+        <div class="row g-3">
+            <div class="col-12"><label for="search" class="form-label">Search</label><input disabled id="search" class="form-control" type="search" placeholder="Search product descriptions"></div>
+            <div class="col-12">
+                <label for="category" class="form-label">Category</label>
+                {% include "products/includes/category_picker.html" with prefix="" %}
+            </div>
+            <div class="col-12">
+                <label for="tags" class="form-label">Tags</label>
+                {% include "products/includes/tags_picker.html" with prefix="" %}
+            </div>
+            <div class="col-12 d-flex justify-content-end">
+                <button type="button" id="clear-filters" class="btn btn-outline-secondary btn-sm rounded-pill px-3">Clear filters</button>
+            </div>
+        </div>
+    </fieldset>
+    <div class="product-grid">
+        {% for product in products %}
+        <div>{% include "products/includes/product_card.html" %}</div>
+        {% endfor %}
+    </div>
+</section>
+<div class="modal fade" id="admin-modal" tabindex="-1" aria-labelledby="admin-modal-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+        <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden">
+            <div id="discard-confirmation" class="discard-overlay" hidden>
+                <div class="bg-white rounded-4 shadow-lg p-4" role="alertdialog" aria-modal="true" aria-labelledby="discard-title" aria-describedby="discard-description">
+                    <div class="text-warning mb-3" aria-hidden="true">
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 10 18H2L12 3Z"/><path d="M12 9v5M12 17h.01"/></svg>
+                    </div>
+                    <h3 id="discard-title" class="fs-5 fw-semibold">Discard changes?</h3>
+                    <p id="discard-description" class="text-secondary small mb-4">Your unsaved changes will be lost. You can keep adding or discard them and close.</p>
+                    <div class="d-flex flex-wrap justify-content-end gap-2">
+                        <button type="button" id="keep-editing" class="btn btn-light btn-sm rounded-pill px-3">Keep adding</button>
+                        <button type="button" id="discard-changes" class="btn btn-danger btn-sm rounded-pill px-3">Discard changes</button>
+                    </div>
+                </div>
+            </div>
+            <div id="add-success" class="discard-overlay" hidden>
+                <div class="bg-white rounded-4 shadow-lg p-4 text-center" role="dialog" aria-modal="true" aria-labelledby="add-success-title" aria-describedby="add-success-note">
+                    <div class="text-success mb-3" aria-hidden="true">
+                        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>
+                    </div>
+                    <h3 id="add-success-title" class="fs-5 fw-semibold"></h3>
+                    <p id="add-success-note" class="small text-secondary mb-4">Preview only — no data has been saved.</p>
+                    <button type="button" id="close-add-success" class="btn btn-success btn-sm rounded-pill px-4">Done</button>
+                </div>
+            </div>
+            <div class="modal-header border-0 px-4 pt-4">
+                <h2 id="admin-modal-title" class="modal-title fs-5 fw-semibold">Admin</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 d-flex flex-column">
+                <div class="row g-0 align-items-stretch flex-grow-1 w-100">
+                    <div class="col-md-6 d-flex align-items-center justify-content-center p-4 p-lg-5">
+                        <img src="{% static 'products/assets/SVG/admin.svg' %}" class="img-fluid admin-illustration" alt="" aria-hidden="true">
+                    </div>
+                    <div class="col-md-6 px-3 d-flex flex-column justify-content-center" id="admin-forms">
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-4">
+                    <button type="button" class="btn btn-primary badge rounded-pill border-0 px-3 py-2" data-bs-toggle="collapse" data-bs-target="#add-category-panel" aria-expanded="false" aria-controls="add-category-panel">Add category</button>
+                    <button type="button" class="btn btn-success badge rounded-pill border-0 px-3 py-2" data-bs-toggle="collapse" data-bs-target="#add-tag-panel" aria-expanded="false" aria-controls="add-tag-panel">Add tag</button>
+                    <button type="button" class="btn badge rounded-pill border-0 px-3 py-2 admin-button" data-bs-toggle="collapse" data-bs-target="#add-product-panel" aria-expanded="false" aria-controls="add-product-panel">Add product</button>
+                </div>
+
+                        <div id="add-category-panel" class="collapse" data-bs-parent="#admin-forms">
+                            <form class="admin-demo-form pb-3" aria-label="Add category">
+                                <h3 class="fs-6 mb-3">Add category</h3>
+                                <label for="new-category-title" class="form-label small">Title</label>
+                                <input id="new-category-title" class="form-control form-control-sm mb-3" maxlength="100" required>
+                                <label for="new-category-parent-category" class="form-label small">Parent category <span class="text-secondary">(optional)</span></label>
+                                <div class="mb-3">{% include "products/includes/category_picker.html" with prefix="new-category-parent-" category_placeholder="No parent" field_name="parent" as_dropdown=True %}</div>
+                                <button type="submit" class="btn btn-primary btn-sm rounded-pill px-3">Add category</button>
+                                <p class="admin-form-status small text-secondary mt-2 mb-0" role="status"></p>
+                            </form>
+                        </div>
+                        <div id="add-tag-panel" class="collapse" data-bs-parent="#admin-forms">
+                            <form class="admin-demo-form pb-3" aria-label="Add tag">
+                                <h3 class="fs-6 mb-3">Add tag</h3>
+                                <label for="new-tag-title" class="form-label small">Title</label>
+                                <input id="new-tag-title" class="form-control form-control-sm mb-3" maxlength="100" required>
+                                <button type="submit" class="btn btn-success btn-sm rounded-pill px-3">Add tag</button>
+                                <p class="admin-form-status small text-secondary mt-2 mb-0" role="status"></p>
+                            </form>
+                        </div>
+                        <div id="add-product-panel" class="collapse" data-bs-parent="#admin-forms">
+                            <form class="admin-demo-form pb-3" aria-label="Add product">
+                                <h3 class="fs-6 mb-3">Add product</h3>
+                                <label for="new-product-title" class="form-label small">Title</label>
+                                <input id="new-product-title" class="form-control form-control-sm mb-3" maxlength="200" required>
+                                <label for="new-product-category" class="form-label small">Category</label>
+                                <div class="mb-3">{% include "products/includes/category_picker.html" with prefix="new-product-" category_placeholder="Select category" as_dropdown=True %}</div>
+                                <div class="mb-3">
+                                    <label for="new-product-tags" class="form-label small">Tags <span class="text-secondary">(optional)</span></label>
+                                    {% include "products/includes/tags_picker.html" with prefix="new-product-" tags_placeholder="Select tags" as_dropdown=True %}
+                                </div>
+                                <label for="new-product-description" class="form-label small">Description <span class="text-secondary">(optional)</span></label>
+                                <textarea id="new-product-description" class="form-control form-control-sm mb-3" rows="3"></textarea>
+                                <div class="d-flex justify-content-end align-items-center gap-2 mb-3">
+                                    <span id="product-image-name" class="small text-secondary text-truncate" aria-live="polite"></span>
+                                    <input id="new-product-image" type="file" accept="image/*" hidden>
+                                    <button id="upload-product-image" type="button" class="btn btn-primary btn-sm rounded-pill px-3 flex-shrink-0">Upload image</button>
+                                </div>
+                                <button type="submit" class="btn btn-sm rounded-pill px-3 admin-button">Add product</button>
+                                <p class="admin-form-status small text-secondary mt-2 mb-0" role="status"></p>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="product-modal" tabindex="-1" aria-labelledby="product-modal-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content border-0 rounded-4 shadow-lg">
+            <div class="modal-header border-0 pb-0 justify-content-end">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="row g-4 align-items-center">
+                    <div class="col-md-6"><img id="product-modal-image" class="w-100 rounded-3" alt=""></div>
+                    <div class="col-md-6">
+                        <h2 class="fs-5 mb-3" id="product-modal-title"></h2>
+                        <p id="product-modal-description" class="text-secondary mb-0"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 justify-content-start px-4 pb-4">
+                <div id="product-modal-labels" class="d-flex flex-wrap gap-2"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'products/dashboard.js' %}"></script>
+{% endblock %}

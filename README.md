@@ -25,7 +25,8 @@ are deferred in the [user-requested TODO list](docs/todo.md).
 
 ## AI assistance
 
-Codex also integrated Bootstrap and generated the shared base template.
+Codex also integrated Bootstrap and generated the shared base template, static
+dashboard view and templates, styling, and product image fallback.
 
 Codex generated the initial `Tag`, `Category`, `AssetType`, `Asset`, and `Product` models,
 app configuration, and migrations, added the Category parent relation, and assisted
@@ -40,8 +41,22 @@ Source: https://cdn.jsdelivr.net/npm/bootstrap@5.3.9/.
 No npm installation, front-end build, or runtime CDN access is required.
 
 New templates can use `{% extends "products/base.html" %}` and override the
-`title`, `content`, `extra_css`, and `extra_js` blocks. The base template is ready;
-no listing view or route has been added yet.
+`title`, `content`, `extra_css`, and `extra_js` blocks.
+
+Run `.venv/bin/python manage.py runserver` and open http://127.0.0.1:8000/ for the
+dashboard. The six product cards are static demo content, not database
+records. Category selection and the multi-select tag panel use static sample
+options; tags support clearing selections. Both panels use Bootstrap Collapse to expand inline in the sidebar and include case-insensitive
+search over their sample options. Category search reveals matching branches and
+their ancestors; clearing the search restores previous expansion states. Tag
+search preserves existing selections. These selections do not filter the
+cards yet, and the search input remains disabled. No database queries
+are needed to display this page.
+
+The supplied placeholder image was moved to
+`products/static/products/assets/images/image-not-available.jpg`. The reusable
+`products/includes/product_card.html` template displays it when `product.image`
+or its URL is absent/empty; otherwise it displays `product.image.url`.
 
 ## Database
 

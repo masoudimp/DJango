@@ -1,0 +1,24 @@
+{% load static %}
+<article class="card product-card h-100 border-0" tabindex="0" aria-label="View details for {{ product.title }}" aria-haspopup="dialog" aria-controls="product-modal">
+    <h6 class="product-title fw-semibold text-start px-3 pt-3 mb-2">{{ product.title }}</h6>
+    <div class="product-media position-relative">
+    {% if product.image.url %}
+        <img class="card-img-top product-image" src="{{ product.image.url }}" alt="{{ product.title }}" loading="lazy">
+    {% else %}
+        <img class="card-img-top product-image" src="{% static 'products/assets/images/image-not-available.jpg' %}" alt="Image not available for {{ product.title }}" loading="lazy">
+    {% endif %}
+    </div>
+    <div class="card-body p-3">
+        <div class="badge-rail d-flex align-items-center gap-1 mb-3">
+            <button type="button" class="badge-scroll btn btn-sm p-0" data-scroll="-1" aria-label="Scroll labels left" hidden>&lt;</button>
+            <div class="badge-track d-flex align-items-center gap-1">
+                <span class="badge text-bg-light border">{{ product.category }}</span>
+                {% for tag in product.tags %}
+                    <span class="badge text-bg-light border">{{ tag }}</span>
+                {% endfor %}
+            </div>
+            <button type="button" class="badge-scroll btn btn-sm p-0" data-scroll="1" aria-label="Scroll labels right" hidden>&gt;</button>
+        </div>
+        <p class="product-description description-clamp text-secondary mb-0" tabindex="0" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ product.description|default:'No description available.' }}">{{ product.description|default:"No description available." }}</p>
+    </div>
+</article>

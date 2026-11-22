@@ -176,6 +176,26 @@ Record meaningful project decisions here so the applicant and future agents can 
 
 **Supersedes / superseded by:** None.
 
+### DEC-009: Add a static dashboard and product image fallback
+
+- Date: 2026-11-22
+- Status: Accepted
+- Source / decision maker: User (static dashboard, asset folder, and supplied fallback image); Agent (layout and reusable card template)
+
+**Context:** Preview the catalog interface before connecting it to database records.
+
+**Options considered:** Database-backed cards versus fixed demonstration content; inline image handling versus a reusable card template.
+
+**Decision:** Serve a Bootstrap dashboard at `/` with static statistics and six sample products. Keep search/filter controls disabled and label the page as a preview. Move the supplied image to `products/static/products/assets/images/image-not-available.jpg`. Use a shared card template that selects the placeholder when the image relation or URL is empty, and the asset URL otherwise.
+
+**Rationale:** Provides the requested interface without introducing database population or query behavior. The fallback also supports real Product instances later.
+
+**Tradeoffs:** Statistics are illustrative and filters are not functional yet; this is an intermediate step, not completion of the assignment's search/filter requirements. The fallback covers absent URLs, not remote download failures.
+
+**Implementation / verification:** Django system check passed. Verified HTTP 200 and zero database queries for the dashboard, six fallback images, and template behavior with null, blank, and populated image URLs. Browser preview was unavailable, so visual QA could not be completed. No migrations or TODO items were added.
+
+**Supersedes / superseded by:** None.
+
 ## Entry template
 
 Copy this template into the Decisions section for each new entry:

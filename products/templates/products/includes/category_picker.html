@@ -1,0 +1,36 @@
+<div data-picker="category" data-prefix="{{ prefix }}" class="{% if as_dropdown %}dropdown{% else %}accordion border rounded-3 overflow-hidden{% endif %}">
+                    <button id="{{ prefix }}category" type="button" class="{% if as_dropdown %}form-select text-start{% else %}accordion-button collapsed px-3 py-2{% endif %}" {% if as_dropdown %}data-bs-toggle="dropdown" data-bs-auto-close="outside"{% else %}data-bs-toggle="collapse" data-bs-target="#{{ prefix }}category-panel"{% endif %} aria-expanded="false" aria-controls="{{ prefix }}category-panel">
+                        <span id="{{ prefix }}category-summary">{{ category_placeholder|default:"All categories" }}</span>
+                    </button>
+                    <input type="hidden" name="{{ field_name|default:'category' }}" id="{{ prefix }}category-value" value="">
+                    <div id="{{ prefix }}category-panel" class="{% if as_dropdown %}dropdown-menu tag-menu w-100{% else %}collapse{% endif %}" aria-labelledby="{{ prefix }}category">
+                    <ul class="category-menu list-unstyled p-2 mb-0">
+                        <li class="p-1 mb-2"><input id="{{ prefix }}category-search" type="search" class="form-control form-control-sm" placeholder="Search categories…" aria-label="Search categories" autocomplete="off"></li>
+                        <li id="{{ prefix }}category-no-results" class="small text-secondary px-2 py-2" role="status" hidden>No categories found.</li>
+                        <li><button type="button" class="dropdown-item active" data-category="" aria-current="true">{{ category_placeholder|default:"All categories" }}</button></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <div class="category-branch">
+                                <button type="button" class="dropdown-item" data-category="tools">Tools</button>
+                                <button type="button" class="category-toggle" aria-label="Toggle Tools subcategories" aria-expanded="false" aria-controls="{{ prefix }}tools-children"><span aria-hidden="true">›</span></button>
+                            </div>
+                            <ul id="{{ prefix }}tools-children" class="category-children list-unstyled collapse">
+                                <li>
+                                    <div class="category-branch">
+                                        <button type="button" class="dropdown-item" data-category="power-tools">Power tools</button>
+                                        <button type="button" class="category-toggle" aria-label="Toggle Power tools subcategories" aria-expanded="false" aria-controls="{{ prefix }}power-tools-children"><span aria-hidden="true">›</span></button>
+                                    </div>
+                                    <ul id="{{ prefix }}power-tools-children" class="category-children list-unstyled collapse">
+                                        <li><button type="button" class="dropdown-item" data-category="drills">Drills</button></li>
+                                    </ul>
+                                </li>
+                                <li><button type="button" class="dropdown-item" data-category="hand-tools">Hand tools</button></li>
+                            </ul>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><button type="button" class="dropdown-item" data-category="safety">Safety equipment</button></li>
+                        <li><button type="button" class="dropdown-item" data-category="electrical">Electrical</button></li>
+                        <li><button type="button" class="dropdown-item" data-category="storage">Storage</button></li>
+                    </ul>
+                    </div>
+                </div>
