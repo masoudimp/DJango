@@ -4,8 +4,8 @@ from django.db import IntegrityError, transaction
 from django.views.decorators.http import require_POST
 from django.db.models.deletion import ProtectedError
 
-from .forms import CategoryForm, TagForm
-from .models import Category, Tag
+from .forms import CategoryForm, ProductForm, TagForm
+from .models import Category, Product, Tag
 
 
 def category_tree():
@@ -103,43 +103,62 @@ def delete_category(request, pk):
     return redirect("/manage/?section=category")
 
 
-def dashboard(request, tag_form=None):
-    products = [
-        {"title": "Cordless drill", "category": "Power tools", "description": "Compact cordless drill for everyday installation and assembly work. Its comfortable grip and adjustable speed help with precise drilling, while the lightweight design makes it easy to carry between jobs.", "image": None, "tags": ["Cordless", "Heavy duty", "Professional", "Compact"]},
-        {"title": "Safety helmet", "category": "Safety equipment", "description": "A practical safety helmet for everyday work on site. The adjustable fit and comfortable interior make it suitable for extended use, with a lightweight shell that is easy to store alongside other protective equipment.", "image": None},
-        {"title": "Cable reel", "category": "Electrical", "description": "Keep cables organized and ready for the next job with this portable cable reel. The sturdy frame and convenient handle make transport simple, while the winding design helps reduce tangles during storage.", "image": None},
-        {"title": "Adjustable wrench", "category": "Hand tools", "description": "A versatile adjustable wrench for assembly, repairs, and routine maintenance. The adjustable jaw accommodates different fastener sizes, and the comfortable handle provides control when working in tight spaces.", "image": None},
-        {"title": "Work gloves", "category": "Safety equipment", "description": "Comfortable work gloves for handling tools, supplies, and materials throughout the day. Their flexible construction supports a secure grip and freedom of movement, making them a useful addition to an everyday work kit.", "image": None},
-        {"title": "Storage case", "category": "Storage", "description": "Organize small parts and essential accessories in a convenient storage case. Separate compartments keep items easy to find, while the compact design fits neatly on a shelf or travels with the rest of your equipment.", "image": None},
-    ]
-    demo_tags = list(Tag.objects.order_by("title").values_list("title", flat=True))
+@require_POST
+def create_product(request):
+    form = ProductForm(request.POST)
+    if form.is_valid():
+        with transaction.atomic():
+            form.save()
+        messages.success(request, "Product added successfully.")
+        return redirect("/manage/?section=product")
+    return management(request, product_form=form)
+
+
+@require_POST
+def edit_product(request, pk):
+    product = get_object_or_404(Product, pk=pk)
+    form = ProductForm(request.POST, instance=product)
+    if form.is_valid():
+        with transaction.atomic():
+            form.save()
+        messages.success(request, "Product updated successfully.")
+        return redirect("/manage/?section=product")
+    return management(request, product_form=form)
+
+
+@require_POST
+def delete_product(request, pk):
+    product = get_object_or_404(Product, pk=pk)
+    product.delete()
+    messages.success(request, "Product deleted successfully.")
+    return redirect("/manage/?section=product")
+
+
+def dashboard(request):
     return render(request, "products/dashboard.html", {
-        "products": products,
-        "demo_tags": demo_tags,
+        "products": Product.objects.select_related("category", "image").prefetch_related("tags").order_by("title", "id"),
+        "demo_tags": Tag.objects.order_by("title", "id"),
         "categories": category_tree(),
-        "tag_form": tag_form,
-    }, status=400 if tag_form is not None else 200)
+    })
 
 
-def management(request, tag_form=None, category_form=None, category_error=None):
-    # Products are samples; categories and tags come from the database.
+def management(request, tag_form=None, category_form=None, category_error=None, product_form=None):
     sections = [
-        {"key": "product", "title": "Products", "detail_label": "Category", "rows": [
-            {"id": 1, "title": "Cordless drill", "detail": "Power tools", "category": "power-tools", "tags": "Cordless|Compact", "description": "Compact cordless drill for everyday installation and assembly work."},
-            {"id": 2, "title": "Safety helmet", "detail": "Safety equipment", "category": "safety", "tags": "Lightweight", "description": "Comfortable head protection for work on site."},
-            {"id": 3, "title": "Storage case", "detail": "Storage", "category": "storage", "tags": "Compact", "description": "Organize small parts and essential accessories."},
-        ]},
+        {"key": "product", "title": "Products", "detail_label": "Category",
+         "rows": Product.objects.select_related("category").prefetch_related("tags").order_by("title", "id")},
         {"key": "category", "title": "Categories", "detail_label": "Parent category",
          "rows": Category.objects.select_related("parent").order_by("title", "id")},
         {"key": "tag", "title": "Tags", "rows": Tag.objects.order_by("title", "id")},
     ]
     return render(request, "products/management.html", {
         "sections": sections,
-        "demo_tags": ["Cordless", "Compact", "Lightweight", "Heavy duty", "Professional"],
+        "demo_tags": Tag.objects.order_by("title", "id"),
+        "product_form": product_form,
+        "selected_tag_ids": product_form["tags"].value() if product_form is not None else [],
         "management": True,
-        "active_section": "category" if category_form is not None or category_error else "tag" if tag_form is not None else request.GET.get("section", "product"),
+        "active_section": "product" if product_form is not None else "category" if category_form is not None or category_error else "tag" if tag_form is not None else request.GET.get("section", "product"),
         "categories": category_tree(),
         "category_form": category_form,
         "category_error": category_error,
         "tag_form": tag_form,
-    }, status=400 if tag_form is not None or category_form is not None or category_error else 200)
+    }, status=400 if tag_form is not None or category_form is not None or category_error or product_form is not None else 200)

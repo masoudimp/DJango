@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Category, Tag
+from .models import Category, Product, Tag
 
 
 class TagForm(forms.ModelForm):
@@ -25,3 +25,9 @@ class CategoryForm(forms.ModelForm):
             visited.add(ancestor.pk)
             ancestor = ancestor.parent
         return parent
+
+
+class ProductForm(forms.ModelForm):
+    class Meta:
+        model = Product
+        fields = ["title", "description", "category", "tags"]

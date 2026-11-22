@@ -22,9 +22,7 @@ function openManagementForm(kind, row, trigger) {
     form.querySelector("h3").hidden = true;
     form.querySelector('[type="submit"]').textContent = editing ? "Save changes" : `Add ${kind}`;
     form.dataset.mode = editing ? "edit" : "add";
-    if (kind === "tag" || kind === "category") {
-        form.action = editing ? row.dataset.editUrl : form.dataset.createUrl;
-    }
+    form.action = editing ? row.dataset.editUrl : form.dataset.createUrl;
     document.querySelectorAll("#admin-forms > .collapse").forEach((item) => {
         item.classList.toggle("show", item === panel);
     });
@@ -75,7 +73,9 @@ document.querySelectorAll("[data-manage-delete]").forEach((button) => {
         document.getElementById("delete-preview-status").textContent = deleteUrl
             ? button.closest("tr").dataset.kind === "category"
                 ? "Categories with subcategories or products cannot be deleted."
-                : "This will delete the tag and remove it from any linked products."
+                : button.closest("tr").dataset.kind === "product"
+                    ? "This will delete the product. Its category and tags will be kept."
+                    : "This will delete the tag and remove it from any linked products."
             : "Preview only — no records will be deleted.";
         bootstrap.Modal.getOrCreateInstance(deletePreview).show();
     });
@@ -98,7 +98,7 @@ if (managementSuccess) {
     });
 }
 
-["tag", "category"].forEach((kind) => {
+["tag", "category", "product"].forEach((kind) => {
     const form = document.getElementById(`create-${kind}-form`);
     if (!document.getElementById(`management-${kind}-invalid`)) return;
     const editing = form.dataset.mode === "edit";

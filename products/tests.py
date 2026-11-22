@@ -28,7 +28,7 @@ class CreateTagTests(TestCase):
         response = self.client.post(reverse("products:create_tag"), {"title": "  Cordless  "}, follow=True)
         self.assertEqual(Tag.objects.get().title, "Cordless")
         self.assertContains(response, "Tag added successfully")
-        self.assertContains(response, 'value="Cordless"')
+        self.assertContains(response, 'data-label="Cordless"')
 
     def test_invalid_titles_are_not_saved(self):
         for title in ["", "   ", "x" * 101]:
@@ -207,3 +207,139 @@ class CategoryCrudTests(TestCase):
             self.assertEqual(csrf_client.post(url, {"title": "Changed"}).status_code, 403)
         for name in ["edit_category", "delete_category"]:
             self.assertEqual(self.client.post(reverse(f"products:{name}", args=[999999])).status_code, 404)
+
+
+class ProductCrudTests(TestCase):
+    def setUp(self):
+        self.category = Category.objects.create(title="Equipment")
+        self.tag = Tag.objects.create(title='Portable | "Small"')
+        self.other_tag = Tag.objects.create(title="Heavy")
+
+    def test_create_and_render_in_dashboard_and_management(self):
+        response = self.client.post(reverse("products:create_product"), {
+            "title": "  Test drill  ", "category": self.category.pk,
+            "description": "First line\nSecond line", "tags": [self.tag.pk, self.other_tag.pk],
+        }, follow=True)
+        product = Product.objects.get()
+        self.assertEqual(product.title, "Test drill")
+        self.assertEqual(product.category, self.category)
+        self.assertEqual(product.description, "First line\nSecond line")
+        self.assertCountEqual(product.tags.all(), [self.tag, self.other_tag])
+        self.assertIsNone(product.image)
+        self.assertRedirects(response, "/manage/?section=product")
+        self.assertContains(response, "Product added successfully.")
+        self.assertContains(response, f'data-edit-url="{reverse("products:edit_product", args=[product.pk])}"')
+        self.assertContains(response, f'data-category="{self.category.pk}"')
+        response = self.client.get(reverse("products:dashboard"))
+        self.assertContains(response, "Test drill")
+        self.assertContains(response, "Equipment")
+        self.assertContains(response, "Portable | &quot;Small&quot;")
+        self.assertContains(response, "First line\nSecond line")
+
+    def test_edit_replaces_tags_and_can_clear_optional_fields(self):
+        product = Product.objects.create(title="Before", category=self.category, description="Old")
+        product.tags.add(self.tag)
+        category = Category.objects.create(title="Other")
+        url = reverse("products:edit_product", args=[product.pk])
+        response = self.client.post(url, {
+            "title": "After", "category": category.pk, "tags": [self.other_tag.pk], "description": "Updated",
+        }, follow=True)
+        self.assertContains(response, "Product updated successfully.")
+        product.refresh_from_db()
+        self.assertEqual(product.title, "After")
+        self.assertEqual(product.category, category)
+        self.assertEqual(product.description, "Updated")
+        self.assertEqual(list(product.tags.all()), [self.other_tag])
+        self.assertEqual(Product.objects.count(), 1)
+        self.assertEqual(self.client.post(url, {"title": "After", "category": category.pk}).status_code, 302)
+        product.refresh_from_db()
+        self.assertFalse(product.description)
+        self.assertFalse(product.tags.exists())
+
+    def test_invalid_create_does_not_save(self):
+        for data in [
+            {"title": "", "category": self.category.pk},
+            {"title": " " * 5, "category": self.category.pk},
+            {"title": "x" * 201, "category": self.category.pk},
+            {"title": "Missing category"},
+            {"title": "Invalid category", "category": 999999},
+            {"title": "Invalid tag", "category": self.category.pk, "tags": [999999]},
+        ]:
+            with self.subTest(data=data):
+                response = self.client.post(reverse("products:create_product"), data)
+                self.assertContains(response, 'id="management-product-invalid"', status_code=400)
+                self.assertFalse(Product.objects.exists())
+
+    def test_invalid_edit_preserves_database_and_submitted_values(self):
+        from html.parser import HTMLParser
+
+        class Inputs(HTMLParser):
+            def __init__(self, html):
+                super().__init__()
+                self.inputs = []
+                self.feed(html)
+
+            def handle_starttag(self, tag, attrs):
+                if tag == "input":
+                    self.inputs.append(dict(attrs))
+
+        product = Product.objects.create(title="Original", category=self.category, description="Original text")
+        product.tags.add(self.tag)
+        url = reverse("products:edit_product", args=[product.pk])
+        response = self.client.post(url, {
+            "title": "", "category": self.category.pk,
+            "description": 'Submitted <text> & "quotes"', "tags": [self.other_tag.pk],
+        })
+        self.assertContains(response, f'action="{url}"', status_code=400)
+        self.assertContains(response, 'id="management-product-invalid"', status_code=400)
+        self.assertContains(response, "Submitted &lt;text&gt; &amp; &quot;quotes&quot;", status_code=400)
+        inputs = Inputs(response.content.decode()).inputs
+        checked = [item["value"] for item in inputs if item.get("name") == "tags" and "checked" in item]
+        self.assertEqual(checked, [str(self.other_tag.pk)])
+        category = next(item for item in inputs if item.get("id") == "new-product-category-value")
+        self.assertEqual(category["value"], str(self.category.pk))
+        product.refresh_from_db()
+        self.assertEqual(product.title, "Original")
+        self.assertEqual(product.description, "Original text")
+        self.assertEqual(list(product.tags.all()), [self.tag])
+
+    def test_delete_keeps_category_tags_and_other_products(self):
+        product = Product.objects.create(title="Delete me", category=self.category)
+        other = Product.objects.create(title="Keep me", category=self.category)
+        product.tags.add(self.tag)
+        other.tags.add(self.tag)
+        response = self.client.post(reverse("products:delete_product", args=[product.pk]), follow=True)
+        self.assertRedirects(response, "/manage/?section=product")
+        self.assertContains(response, "Product deleted successfully.")
+        self.assertFalse(Product.objects.filter(pk=product.pk).exists())
+        self.assertTrue(Category.objects.filter(pk=self.category.pk).exists())
+        self.assertTrue(Tag.objects.filter(pk=self.tag.pk).exists())
+        self.assertEqual(list(other.tags.all()), [self.tag])
+
+    def test_methods_missing_records_and_csrf(self):
+        product = Product.objects.create(title="Original", category=self.category)
+        client = Client(enforce_csrf_checks=True)
+        client.get(reverse("products:management"))
+        token = client.cookies["csrftoken"].value
+        for name in ["create_product", "edit_product", "delete_product"]:
+            url = reverse(f"products:{name}", args=[] if name == "create_product" else [product.pk])
+            self.assertEqual(self.client.get(url).status_code, 405)
+            data = {"title": "Changed", "category": self.category.pk}
+            self.assertEqual(client.post(url, data).status_code, 403)
+            self.assertEqual(client.post(url, {**data, "csrfmiddlewaretoken": token}).status_code, 302)
+        for name in ["edit_product", "delete_product"]:
+            self.assertEqual(self.client.post(reverse(f"products:{name}", args=[999999])).status_code, 404)
+
+    def test_empty_dashboard_and_optional_fields(self):
+        response = self.client.get(reverse("products:dashboard"))
+        self.assertContains(response, "No products found.")
+        response = self.client.post(reverse("products:create_product"), {
+            "title": "Minimal", "category": self.category.pk,
+        })
+        self.assertEqual(response.status_code, 302)
+        product = Product.objects.get()
+        self.assertFalse(product.tags.exists())
+        self.assertFalse(product.description)
+        response = self.client.get(reverse("products:dashboard"))
+        self.assertContains(response, "No description available.")
+        self.assertContains(response, "image-not-available.jpg")

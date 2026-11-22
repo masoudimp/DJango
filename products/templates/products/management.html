@@ -4,6 +4,7 @@
 {% block extra_css %}<link rel="stylesheet" href="{% static 'products/dashboard.css' %}">{% endblock %}
 {% block content %}
 {% include "products/includes/header.html" %}
+{% if product_form %}<span id="management-product-invalid" hidden></span>{% endif %}
 {% if category_form %}<span id="management-category-invalid" hidden></span>{% endif %}
 {% if category_error %}<div class="alert alert-danger" role="alert">{{ category_error }}</div>{% endif %}
 {% if tag_form %}<span id="management-tag-invalid" hidden></span>{% endif %}
@@ -30,7 +31,7 @@
         </nav>
     </aside>
     <div class="col-12 col-lg-9 col-xl-10">
-        <p class="small text-secondary mb-3">Tags and categories can be added, edited, and deleted in the database. Products are previews.</p>
+        <p class="small text-secondary mb-3">Manage your products, categories, and tags.</p>
         <div class="tab-content">
             {% for section in sections %}
             <section class="tab-pane fade {% if section.key == active_section %}show active{% endif %}" id="{{ section.key }}-table" role="tabpanel" aria-labelledby="{{ section.key }}-tab" tabindex="0">
@@ -45,10 +46,10 @@
                             <thead class="table-light"><tr><th scope="col">ID</th><th scope="col">Title</th>{% if section.detail_label %}<th scope="col">{{ section.detail_label }}</th>{% endif %}<th scope="col" class="text-end">Actions</th></tr></thead>
                             <tbody>
                                 {% for row in section.rows %}
-                                <tr data-kind="{{ section.key }}" data-title="{{ row.title }}" data-category="{% if section.key == 'category' %}{{ row.parent_id|default_if_none:'' }}{% else %}{{ row.category|default:'' }}{% endif %}" data-tags="{{ row.tags|default:'' }}" data-description="{{ row.description|default:'' }}" {% if section.key == 'tag' %}data-edit-url="{% url 'products:edit_tag' row.id %}" data-delete-url="{% url 'products:delete_tag' row.id %}"{% elif section.key == 'category' %}data-edit-url="{% url 'products:edit_category' row.id %}" data-delete-url="{% url 'products:delete_category' row.id %}"{% endif %}>
+                                <tr data-kind="{{ section.key }}" data-title="{{ row.title }}" data-category="{% if section.key == 'category' %}{{ row.parent_id|default_if_none:'' }}{% else %}{{ row.category_id|default_if_none:'' }}{% endif %}" data-tags="{% if section.key == 'product' %}{% for tag in row.tags.all %}{{ tag.pk }}{% if not forloop.last %}|{% endif %}{% endfor %}{% endif %}" data-description="{{ row.description|default:'' }}" {% if section.key == 'tag' %}data-edit-url="{% url 'products:edit_tag' row.id %}" data-delete-url="{% url 'products:delete_tag' row.id %}"{% elif section.key == 'category' %}data-edit-url="{% url 'products:edit_category' row.id %}" data-delete-url="{% url 'products:delete_category' row.id %}"{% elif section.key == 'product' %}data-edit-url="{% url 'products:edit_product' row.id %}" data-delete-url="{% url 'products:delete_product' row.id %}"{% endif %}>
                                     <td class="text-secondary small">{{ row.id }}</td>
                                     <td class="small fw-medium">{{ row.title }}</td>
-                                    {% if section.detail_label %}<td class="small text-secondary">{% if section.key == 'category' %}{{ row.parent.title|default:"—" }}{% else %}{{ row.detail }}{% endif %}</td>{% endif %}
+                                    {% if section.detail_label %}<td class="small text-secondary">{% if section.key == 'category' %}{{ row.parent.title|default:"—" }}{% else %}{{ row.category.title }}{% endif %}</td>{% endif %}
                                     <td class="text-end text-nowrap">
                                         <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3" data-manage-edit aria-label="Edit {{ row.title }}">Edit</button>
                                         <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3 ms-1" data-manage-delete aria-label="Delete {{ row.title }}">Delete</button>

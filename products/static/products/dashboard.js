@@ -1,22 +1,4 @@
 document.documentElement.dataset.inputMode = "pointer";
-const productImageInput = document.getElementById("new-product-image");
-document.getElementById("upload-product-image")?.addEventListener("click", () => productImageInput.click());
-productImageInput?.addEventListener("change", () => {
-    document.getElementById("product-image-name").textContent = productImageInput.files[0]?.name || "";
-});
-document.querySelectorAll('.admin-demo-form:not(#create-tag-form):not(#create-category-form)').forEach((form) => {
-    form.addEventListener("submit", (event) => {
-        event.preventDefault();
-        const category = form.querySelector('input[name="category"]');
-        if (category && !category.value) {
-            form.querySelector(".admin-form-status").textContent = "Please select a category.";
-            form.querySelector('[data-picker="category"] button').focus();
-            return;
-        }
-        form.querySelector(".admin-form-status").textContent = "";
-        showAddSuccess(form);
-    });
-});
 const productModalElement = document.getElementById("product-modal");
 const productModal = productModalElement ? new bootstrap.Modal(productModalElement) : null;
 let activeProductCard = null;
@@ -120,7 +102,7 @@ const emptySummary = tagsSummary.textContent;
 function updateTagsSummary() {
     const selected = tagInputs.filter((input) => input.checked);
     tagsSummary.textContent = selected.length === 0 ? emptySummary
-        : selected.length === 1 ? selected[0].value : `${selected.length} tags selected`;
+        : selected.length === 1 ? selected[0].dataset.label : `${selected.length} tags selected`;
 }
 tagInputs.forEach((input) => input.addEventListener("change", updateTagsSummary));
 getElement("clear-tags").addEventListener("click", () => {
@@ -134,7 +116,7 @@ tagSearch.addEventListener("input", () => {
     const query = tagSearch.value.trim().toLowerCase();
     let matches = 0;
     tagInputs.forEach((input) => {
-        const visible = input.value.toLowerCase().includes(query);
+        const visible = input.dataset.label.toLowerCase().includes(query);
         input.closest(".tag-option").hidden = !visible;
         if (visible) matches += 1;
     });

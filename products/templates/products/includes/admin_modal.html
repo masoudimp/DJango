@@ -61,25 +61,21 @@
                             </form>
                         </div>
                         <div id="add-product-panel" class="collapse" data-bs-parent="#admin-forms">
-                            <form class="admin-demo-form pb-3" aria-label="Add product">
+                            <form id="create-product-form" class="admin-demo-form pb-3" aria-label="Add product" method="post" data-create-url="{% url 'products:create_product' %}" data-mode="{% if product_form.instance.pk %}edit{% else %}add{% endif %}" action="{% if product_form.instance.pk %}{% url 'products:edit_product' product_form.instance.pk %}{% else %}{% url 'products:create_product' %}{% endif %}">
+                                {% csrf_token %}
                                 <h3 class="fs-6 mb-3">Add product</h3>
                                 <label for="new-product-title" class="form-label small">Title</label>
-                                <input id="new-product-title" class="form-control form-control-sm mb-3" maxlength="200" required>
+                                <input id="new-product-title" name="title" value="{{ product_form.title.value|default_if_none:'' }}" class="form-control form-control-sm mb-3" maxlength="200" required>
                                 <label for="new-product-category" class="form-label small">Category</label>
-                                <div class="mb-3">{% include "products/includes/category_picker.html" with prefix="new-product-" category_placeholder="Select category" as_dropdown=True %}</div>
+                                <div class="mb-3">{% include "products/includes/category_picker.html" with prefix="new-product-" category_placeholder="Select category" selected_parent=product_form.category.value as_dropdown=True %}</div>
                                 <div class="mb-3">
                                     <label for="new-product-tags" class="form-label small">Tags <span class="text-secondary">(optional)</span></label>
-                                    {% include "products/includes/tags_picker.html" with prefix="new-product-" tags_placeholder="Select tags" as_dropdown=True %}
+                                    {% include "products/includes/tags_picker.html" with prefix="new-product-" tags_placeholder="Select tags" use_ids=True as_dropdown=True %}
                                 </div>
                                 <label for="new-product-description" class="form-label small">Description <span class="text-secondary">(optional)</span></label>
-                                <textarea id="new-product-description" class="form-control form-control-sm mb-3" rows="3"></textarea>
-                                <div class="d-flex justify-content-end align-items-center gap-2 mb-3">
-                                    <span id="product-image-name" class="small text-secondary text-truncate" aria-live="polite"></span>
-                                    <input id="new-product-image" type="file" accept="image/*" hidden>
-                                    <button id="upload-product-image" type="button" class="btn btn-primary btn-sm rounded-pill px-3 flex-shrink-0">Upload image</button>
-                                </div>
+                                <textarea id="new-product-description" name="description" class="form-control form-control-sm mb-3" rows="3">{{ product_form.description.value|default_if_none:'' }}</textarea>
                                 <button type="submit" class="btn btn-sm rounded-pill px-3 admin-button">Add product</button>
-                                <p class="admin-form-status small text-secondary mt-2 mb-0" role="status"></p>
+                                <div class="admin-form-status small text-danger mt-2 mb-0" role="status">{{ product_form.title.errors }}{{ product_form.category.errors }}{{ product_form.tags.errors }}{{ product_form.description.errors }}{{ product_form.non_field_errors }}</div>
                             </form>
                         </div>
                     </div>

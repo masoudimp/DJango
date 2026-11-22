@@ -26,6 +26,8 @@
     <div class="product-grid">
         {% for product in products %}
         <div>{% include "products/includes/product_card.html" %}</div>
+        {% empty %}
+        <p class="text-secondary">No products found.</p>
         {% endfor %}
     </div>
 </section>

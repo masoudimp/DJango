@@ -13,7 +13,7 @@
             <button type="button" class="badge-scroll btn btn-sm p-0" data-scroll="-1" aria-label="Scroll labels left" hidden>&lt;</button>
             <div class="badge-track d-flex align-items-center gap-1">
                 <span class="badge text-bg-light border">{{ product.category }}</span>
-                {% for tag in product.tags %}
+                {% for tag in product.tags.all %}
                     <span class="badge text-bg-light border">{{ tag }}</span>
                 {% endfor %}
             </div>
