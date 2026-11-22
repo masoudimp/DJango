@@ -50,7 +50,7 @@ class CreateTagTests(TestCase):
         client = Client(enforce_csrf_checks=True)
         url = reverse("products:create_tag")
         self.assertEqual(client.post(url, {"title": "Tools"}).status_code, 403)
-        client.get(reverse("products:dashboard"))
+        client.get(reverse("products:management"))
         token = client.cookies["csrftoken"].value
         self.assertEqual(client.post(url, {"title": "Tools", "csrfmiddlewaretoken": token}).status_code, 302)
 

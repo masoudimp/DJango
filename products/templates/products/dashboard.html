@@ -5,10 +5,6 @@
 <link rel="stylesheet" href="{% static 'products/dashboard.css' %}">
 {% endblock %}
 {% block content %}
-{% for message in messages %}
-    <span id="tag-saved" hidden>{{ message }}</span>
-{% endfor %}
-{% if tag_form %}<span id="tag-invalid" hidden></span>{% endif %}
 {% include "products/includes/header.html" %}
 <section aria-label="Products" class="catalog-layout">
     <fieldset aria-label="Product filters" class="filter-panel card border-0 shadow-sm p-3 mb-0">
@@ -33,7 +29,6 @@
         {% endfor %}
     </div>
 </section>
-{% include "products/includes/admin_modal.html" %}
 <div class="modal fade" id="product-modal" tabindex="-1" aria-labelledby="product-modal-title" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
         <div class="modal-content border-0 rounded-4 shadow-lg">

@@ -1,7 +1,7 @@
 document.documentElement.dataset.inputMode = "pointer";
 const productImageInput = document.getElementById("new-product-image");
-document.getElementById("upload-product-image").addEventListener("click", () => productImageInput.click());
-productImageInput.addEventListener("change", () => {
+document.getElementById("upload-product-image")?.addEventListener("click", () => productImageInput.click());
+productImageInput?.addEventListener("change", () => {
     document.getElementById("product-image-name").textContent = productImageInput.files[0]?.name || "";
 });
 document.querySelectorAll('.admin-demo-form:not(#create-tag-form)').forEach((form) => {
@@ -230,7 +230,7 @@ categorySearch.addEventListener("input", () => {
 });
 
 const adminModalElement = document.getElementById("admin-modal");
-const adminFields = [...adminModalElement.querySelectorAll("form input, form textarea, form select")];
+const adminFields = [...(adminModalElement?.querySelectorAll("form input, form textarea, form select") || [])];
 const initialAdminFields = adminFields.map((field) => ({
     field,
     value: field.value,
@@ -268,11 +268,11 @@ function closeDiscardConfirmation(discard = false) {
         }
     }, duration);
 }
-keepEditingButton.addEventListener("click", () => closeDiscardConfirmation());
-discardButton.addEventListener("click", () => {
+keepEditingButton?.addEventListener("click", () => closeDiscardConfirmation());
+discardButton?.addEventListener("click", () => {
     closeDiscardConfirmation(true);
 });
-discardConfirmation.addEventListener("keydown", (event) => {
+discardConfirmation?.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
         event.preventDefault();
         event.stopPropagation();
@@ -282,7 +282,7 @@ discardConfirmation.addEventListener("keydown", (event) => {
         (document.activeElement === keepEditingButton ? discardButton : keepEditingButton).focus();
     }
 });
-adminModalElement.addEventListener("hide.bs.modal", (event) => {
+adminModalElement?.addEventListener("hide.bs.modal", (event) => {
     if (event.target !== adminModalElement) return;
     if (!addSuccess.hidden) {
         event.preventDefault();
@@ -302,7 +302,7 @@ adminModalElement.addEventListener("hide.bs.modal", (event) => {
         keepEditingButton.focus();
     }
 });
-adminModalElement.addEventListener("hidden.bs.modal", (event) => {
+adminModalElement?.addEventListener("hidden.bs.modal", (event) => {
     if (event.target !== adminModalElement) return;
     allowAdminDiscard = false;
     initialAdminFields.forEach(({ field, value, checked }) => {
@@ -324,7 +324,7 @@ adminModalElement.addEventListener("hidden.bs.modal", (event) => {
     });
 });
 // Finish resetting a panel even if it was still animating when the modal closed.
-adminModalElement.addEventListener("shown.bs.collapse", (event) => {
+adminModalElement?.addEventListener("shown.bs.collapse", (event) => {
     if (!adminModalElement.classList.contains("show")) {
         bootstrap.Collapse.getOrCreateInstance(event.target, { toggle: false }).hide();
     }
@@ -383,8 +383,8 @@ function closeAddSuccess() {
         successPreviousFocus?.focus();
     }, matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 200);
 }
-doneAdding.addEventListener("click", closeAddSuccess);
-addSuccess.addEventListener("keydown", (event) => {
+doneAdding?.addEventListener("click", closeAddSuccess);
+addSuccess?.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
         event.preventDefault();
         event.stopPropagation();
@@ -404,16 +404,3 @@ addSuccess.addEventListener("keydown", (event) => {
     panel.querySelector('[data-category=""]').click();
     panel.querySelector("#clear-tags").click();
 });
-
-// A normal Django form POST reloads this page with success or validation errors.
-if (document.getElementById("tag-saved") || document.getElementById("tag-invalid")) {
-    adminModalElement.addEventListener("shown.bs.modal", () => {
-        if (document.getElementById("tag-saved")) {
-            showAddSuccess(document.getElementById("create-tag-form"), true);
-        } else {
-            bootstrap.Collapse.getOrCreateInstance(document.getElementById("add-tag-panel"), { toggle: false }).show();
-            document.getElementById("new-tag-title").focus();
-        }
-    }, { once: true });
-    bootstrap.Modal.getOrCreateInstance(adminModalElement).show();
-}

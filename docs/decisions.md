@@ -268,6 +268,16 @@ Record meaningful project decisions here so the applicant and future agents can 
 
 **Implementation / verification:** Eleven Django tests pass, including management creation and duplicate validation. JavaScript syntax check passed. No TODOs added.
 
+### DEC-014: Remove only the legacy dashboard Admin modal
+
+- Date: 2026-11-22
+- Status: Accepted
+- Source / decision maker: User
+
+**Decision:** Following the user's clarification, keep the header Admin button linking to `/manage/` and remove only the old dashboard modal. Keep management table forms at `/manage/`. Tag creation now returns only to management, including validation errors. Shared JavaScript supports dashboard pages without management controls.
+
+**Verification:** Django tests and JavaScript syntax checked. No TODO entries added.
+
 ## Entry template
 
 Copy this template into the Decisions section for each new entry:

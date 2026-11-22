@@ -16,7 +16,7 @@ endpoint uses CSRF protection but does not yet require login.
 
 ### Management UI preview
 
-The header's **Admin** button now opens `/manage/`. Choose Products, Categories,
+Open `/manage/` directly. Choose Products, Categories,
 or Tags to see tables with row-level Edit/Delete buttons and an Add button.
 Tags are read from SQLite, ordered by title; an empty table shows “No tags found.”
 Products and categories still use sample rows.
@@ -113,3 +113,6 @@ With the virtual environment and Django installed, create the database tables wi
 ```
 
 See [the decision log](docs/decisions.md) for the rationale (DEC-002).
+
+The header Admin button opens `/manage/`; only the legacy dashboard Admin modal has been removed.
+Management forms remain available on `/manage/`; tag submissions return there.

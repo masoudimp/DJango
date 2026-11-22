@@ -9,7 +9,6 @@ from .models import Tag
 
 @require_POST
 def create_tag(request):
-    from_management = request.POST.get("source") == "management"
     form = TagForm(request.POST)
     if form.is_valid():
         try:
@@ -19,12 +18,8 @@ def create_tag(request):
             form.add_error("title", "A tag with this title already exists.")
         else:
             messages.success(request, "Tag added successfully")
-            if from_management:
-                return redirect("/manage/?section=tag")
-            return redirect("products:dashboard")
-    if from_management:
-        return management(request, tag_form=form)
-    return dashboard(request, tag_form=form)
+            return redirect("/manage/?section=tag")
+    return management(request, tag_form=form)
 
 
 @require_POST
