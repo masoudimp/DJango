@@ -12,11 +12,11 @@
             <div class="col-12"><label for="search" class="form-label">Search</label><input disabled id="search" class="form-control" type="search" placeholder="Search product descriptions"></div>
             <div class="col-12">
                 <label for="category" class="form-label">Category</label>
-                {% include "products/includes/category_picker.html" with prefix="" %}
+                {% include "products/includes/category_picker.html" with prefix="" expanded=True %}
             </div>
             <div class="col-12">
                 <label for="tags" class="form-label">Tags</label>
-                {% include "products/includes/tags_picker.html" with prefix="" %}
+                {% include "products/includes/tags_picker.html" with prefix="" expanded=True %}
             </div>
             <div class="col-12 d-flex justify-content-end">
                 <button type="button" id="clear-filters" class="btn btn-outline-secondary btn-sm rounded-pill px-3">Clear filters</button>

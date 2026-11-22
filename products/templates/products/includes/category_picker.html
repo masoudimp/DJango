@@ -1,12 +1,12 @@
 <div data-picker="category" data-prefix="{{ prefix }}" class="{% if as_dropdown %}dropdown{% else %}accordion border rounded-3 overflow-hidden{% endif %}">
-                    <button id="{{ prefix }}category" type="button" class="{% if as_dropdown %}form-select text-start{% else %}accordion-button collapsed px-3 py-2{% endif %}" {% if as_dropdown %}data-bs-toggle="dropdown" data-bs-auto-close="outside"{% else %}data-bs-toggle="collapse" data-bs-target="#{{ prefix }}category-panel"{% endif %} aria-expanded="false" aria-controls="{{ prefix }}category-panel">
+                    <button id="{{ prefix }}category" type="button" class="{% if as_dropdown %}form-select text-start{% else %}accordion-button {% if not expanded %}collapsed {% endif %}px-3 py-2{% endif %}" {% if as_dropdown %}data-bs-toggle="dropdown" data-bs-auto-close="outside"{% else %}data-bs-toggle="collapse" data-bs-target="#{{ prefix }}category-panel"{% endif %} aria-expanded="{% if expanded %}true{% else %}false{% endif %}" aria-controls="{{ prefix }}category-panel">
                         <span id="{{ prefix }}category-summary">{{ category_placeholder|default:"All categories" }}</span>
                     </button>
                     <input type="hidden" name="{{ field_name|default:'category' }}" id="{{ prefix }}category-value" value="{{ selected_parent|default_if_none:'' }}">
-                    <div id="{{ prefix }}category-panel" class="{% if as_dropdown %}dropdown-menu tag-menu w-100{% else %}collapse{% endif %}" aria-labelledby="{{ prefix }}category">
+                    <div id="{{ prefix }}category-panel" class="{% if as_dropdown %}dropdown-menu tag-menu w-100{% else %}collapse{% if expanded %} show{% endif %}{% endif %}" aria-labelledby="{{ prefix }}category">
                     <ul class="category-menu list-unstyled p-2 mb-0">
                         <li class="p-1 mb-2"><input id="{{ prefix }}category-search" type="search" class="form-control form-control-sm" placeholder="Search categories…" aria-label="Search categories" autocomplete="off"></li>
-                        <li id="{{ prefix }}category-no-results" class="small text-secondary px-2 py-2" role="status" hidden>No categories found.</li>
+                        <li id="{{ prefix }}category-no-results" class="small text-secondary px-2 py-2" role="status" {% if categories %}hidden{% endif %}>No categories found.</li>
                         <li><button type="button" class="dropdown-item active" data-category="" aria-current="true">{{ category_placeholder|default:"All categories" }}</button></li>
                         {% include "products/includes/category_options.html" with nodes=categories %}
                     </ul>

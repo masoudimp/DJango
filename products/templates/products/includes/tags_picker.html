@@ -1,8 +1,8 @@
 <div data-picker="tags" data-prefix="{{ prefix }}" class="{% if as_dropdown %}dropdown{% else %}accordion border rounded-3 overflow-hidden{% endif %}">
-                    <button id="{{ prefix }}tags" type="button" class="{% if as_dropdown %}form-select text-start{% else %}accordion-button collapsed px-3 py-2{% endif %}" {% if as_dropdown %}data-bs-toggle="dropdown" data-bs-auto-close="outside"{% else %}data-bs-toggle="collapse" data-bs-target="#{{ prefix }}tags-panel"{% endif %} aria-expanded="false" aria-controls="{{ prefix }}tags-panel">
+                    <button id="{{ prefix }}tags" type="button" class="{% if as_dropdown %}form-select text-start{% else %}accordion-button {% if not expanded %}collapsed {% endif %}px-3 py-2{% endif %}" {% if as_dropdown %}data-bs-toggle="dropdown" data-bs-auto-close="outside"{% else %}data-bs-toggle="collapse" data-bs-target="#{{ prefix }}tags-panel"{% endif %} aria-expanded="{% if expanded %}true{% else %}false{% endif %}" aria-controls="{{ prefix }}tags-panel">
                         <span id="{{ prefix }}tags-summary">{{ tags_placeholder|default:"All tags" }}</span>
                     </button>
-                    <div id="{{ prefix }}tags-panel" class="{% if as_dropdown %}dropdown-menu tag-menu w-100{% else %}collapse{% endif %}" aria-labelledby="{{ prefix }}tags">
+                    <div id="{{ prefix }}tags-panel" class="{% if as_dropdown %}dropdown-menu tag-menu w-100{% else %}collapse{% if expanded %} show{% endif %}{% endif %}" aria-labelledby="{{ prefix }}tags">
                     <div class="p-3">
                         <input id="{{ prefix }}tag-search" type="search" class="form-control form-control-sm mb-3" placeholder="Search tags…" aria-label="Search tags" autocomplete="off">
                         <div class="d-flex align-items-center justify-content-between mb-2">
@@ -17,7 +17,7 @@
                             </label>
                             {% endfor %}
                         </div>
-                        <p id="{{ prefix }}tag-no-results" class="small text-secondary mb-0" role="status" hidden>No tags found.</p>
+                        <p id="{{ prefix }}tag-no-results" class="small text-secondary mb-0" role="status" {% if demo_tags %}hidden{% endif %}>No tags found.</p>
                     </div>
                     </div>
                 </div>

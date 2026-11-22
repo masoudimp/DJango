@@ -234,7 +234,7 @@ categorySearch.addEventListener("input", () => {
         }
     });
     if (!query) categoryExpansionBeforeSearch = null;
-    getElement("category-no-results").hidden = !query || matches.length > 0;
+    getElement("category-no-results").hidden = matches.length > 0;
 });
 
 });
