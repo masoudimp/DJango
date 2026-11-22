@@ -1,0 +1,92 @@
+{% load static %}
+<div class="modal fade" id="admin-modal" tabindex="-1" aria-labelledby="admin-modal-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+        <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden">
+            <div id="discard-confirmation" class="discard-overlay" hidden>
+                <div class="bg-white rounded-4 shadow-lg p-4" role="alertdialog" aria-modal="true" aria-labelledby="discard-title" aria-describedby="discard-description">
+                    <div class="text-warning mb-3" aria-hidden="true">
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 10 18H2L12 3Z"/><path d="M12 9v5M12 17h.01"/></svg>
+                    </div>
+                    <h3 id="discard-title" class="fs-5 fw-semibold">Discard changes?</h3>
+                    <p id="discard-description" class="text-secondary small mb-4">Your unsaved changes will be lost. You can keep adding or discard them and close.</p>
+                    <div class="d-flex flex-wrap justify-content-end gap-2">
+                        <button type="button" id="keep-editing" class="btn btn-light btn-sm rounded-pill px-3">Keep adding</button>
+                        <button type="button" id="discard-changes" class="btn btn-danger btn-sm rounded-pill px-3">Discard changes</button>
+                    </div>
+                </div>
+            </div>
+            <div id="add-success" class="discard-overlay" hidden>
+                <div class="bg-white rounded-4 shadow-lg p-4 text-center" role="dialog" aria-modal="true" aria-labelledby="add-success-title" aria-describedby="add-success-note">
+                    <div class="text-success mb-3" aria-hidden="true">
+                        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>
+                    </div>
+                    <h3 id="add-success-title" class="fs-5 fw-semibold"></h3>
+                    <p id="add-success-note" class="small text-secondary mb-4">Preview only — no data has been saved.</p>
+                    <button type="button" id="close-add-success" class="btn btn-success btn-sm rounded-pill px-4">Done</button>
+                </div>
+            </div>
+            <div class="modal-header border-0 px-4 pt-4">
+                <h2 id="admin-modal-title" class="modal-title fs-5 fw-semibold">Admin</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 d-flex flex-column">
+                <div class="row g-0 align-items-stretch flex-grow-1 w-100">
+                    <div class="col-md-6 d-flex align-items-center justify-content-center p-4 p-lg-5">
+                        <img src="{% static 'products/assets/SVG/admin.svg' %}" class="img-fluid admin-illustration" alt="" aria-hidden="true">
+                    </div>
+                    <div class="col-md-6 px-3 d-flex flex-column justify-content-center" id="admin-forms">
+                {% if not management %}<div class="d-flex flex-wrap align-items-center gap-2 mb-4">
+                    <button type="button" class="btn btn-primary badge rounded-pill border-0 px-3 py-2" data-bs-toggle="collapse" data-bs-target="#add-category-panel" aria-expanded="false" aria-controls="add-category-panel">Add category</button>
+                    <button type="button" class="btn btn-success badge rounded-pill border-0 px-3 py-2" data-bs-toggle="collapse" data-bs-target="#add-tag-panel" aria-expanded="false" aria-controls="add-tag-panel">Add tag</button>
+                    <button type="button" class="btn badge rounded-pill border-0 px-3 py-2 admin-button" data-bs-toggle="collapse" data-bs-target="#add-product-panel" aria-expanded="false" aria-controls="add-product-panel">Add product</button>
+                </div>{% endif %}
+
+                        <div id="add-category-panel" class="collapse" data-bs-parent="#admin-forms">
+                            <form class="admin-demo-form pb-3" aria-label="Add category">
+                                <h3 class="fs-6 mb-3">Add category</h3>
+                                <label for="new-category-title" class="form-label small">Title</label>
+                                <input id="new-category-title" class="form-control form-control-sm mb-3" maxlength="100" required>
+                                <label for="new-category-parent-category" class="form-label small">Parent category <span class="text-secondary">(optional)</span></label>
+                                <div class="mb-3">{% include "products/includes/category_picker.html" with prefix="new-category-parent-" category_placeholder="No parent" field_name="parent" as_dropdown=True %}</div>
+                                <button type="submit" class="btn btn-primary btn-sm rounded-pill px-3">Add category</button>
+                                <p class="admin-form-status small text-secondary mt-2 mb-0" role="status"></p>
+                            </form>
+                        </div>
+                        <div id="add-tag-panel" class="collapse" data-bs-parent="#admin-forms">
+                            <form id="{% if management %}preview-tag-form{% else %}create-tag-form{% endif %}" class="admin-demo-form pb-3" aria-label="Add tag" {% if not management %}method="post" action="{% url 'products:create_tag' %}"{% endif %}>
+                                {% csrf_token %}
+                                <h3 class="fs-6 mb-3">Add tag</h3>
+                                <label for="new-tag-title" class="form-label small">Title</label>
+                                <input id="new-tag-title" name="title" value="{{ tag_form.title.value|default_if_none:'' }}" class="form-control form-control-sm mb-3" maxlength="100" aria-describedby="tag-form-status" required>
+                                <button type="submit" class="btn btn-success btn-sm rounded-pill px-3">Add tag</button>
+                                <div id="tag-form-status" class="admin-form-status small text-danger mt-2 mb-0" role="status">{{ tag_form.title.errors }}</div>
+                            </form>
+                        </div>
+                        <div id="add-product-panel" class="collapse" data-bs-parent="#admin-forms">
+                            <form class="admin-demo-form pb-3" aria-label="Add product">
+                                <h3 class="fs-6 mb-3">Add product</h3>
+                                <label for="new-product-title" class="form-label small">Title</label>
+                                <input id="new-product-title" class="form-control form-control-sm mb-3" maxlength="200" required>
+                                <label for="new-product-category" class="form-label small">Category</label>
+                                <div class="mb-3">{% include "products/includes/category_picker.html" with prefix="new-product-" category_placeholder="Select category" as_dropdown=True %}</div>
+                                <div class="mb-3">
+                                    <label for="new-product-tags" class="form-label small">Tags <span class="text-secondary">(optional)</span></label>
+                                    {% include "products/includes/tags_picker.html" with prefix="new-product-" tags_placeholder="Select tags" as_dropdown=True %}
+                                </div>
+                                <label for="new-product-description" class="form-label small">Description <span class="text-secondary">(optional)</span></label>
+                                <textarea id="new-product-description" class="form-control form-control-sm mb-3" rows="3"></textarea>
+                                <div class="d-flex justify-content-end align-items-center gap-2 mb-3">
+                                    <span id="product-image-name" class="small text-secondary text-truncate" aria-live="polite"></span>
+                                    <input id="new-product-image" type="file" accept="image/*" hidden>
+                                    <button id="upload-product-image" type="button" class="btn btn-primary btn-sm rounded-pill px-3 flex-shrink-0">Upload image</button>
+                                </div>
+                                <button type="submit" class="btn btn-sm rounded-pill px-3 admin-button">Add product</button>
+                                <p class="admin-form-status small text-secondary mt-2 mb-0" role="status"></p>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

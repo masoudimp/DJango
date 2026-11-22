@@ -18,7 +18,7 @@ document.querySelectorAll('.admin-demo-form:not(#create-tag-form)').forEach((for
     });
 });
 const productModalElement = document.getElementById("product-modal");
-const productModal = new bootstrap.Modal(productModalElement);
+const productModal = productModalElement ? new bootstrap.Modal(productModalElement) : null;
 let activeProductCard = null;
 function openProductModal(card) {
     activeProductCard = card;
@@ -48,7 +48,7 @@ document.querySelectorAll(".product-card").forEach((card) => {
         }
     });
 });
-productModalElement.addEventListener("hidden.bs.modal", () => activeProductCard?.focus({ preventScroll: true }));
+productModalElement?.addEventListener("hidden.bs.modal", () => activeProductCard?.focus({ preventScroll: true }));
 document.querySelectorAll(".badge-rail").forEach((rail) => {
     const track = rail.querySelector(".badge-track");
     const buttons = [...rail.querySelectorAll(".badge-scroll")];
@@ -359,7 +359,8 @@ function showAddSuccess(form, saved = false) {
     document.getElementById("add-success-note").textContent = saved
         ? "Your tag has been saved." : "Preview only — no data has been saved.";
     const entity = form.getAttribute("aria-label").replace("Add ", "");
-    document.getElementById("add-success-title").textContent = `${entity[0].toUpperCase()}${entity.slice(1)} added successfully`;
+    const verb = form.dataset.mode === "edit" ? "updated" : "added";
+    document.getElementById("add-success-title").textContent = `${entity[0].toUpperCase()}${entity.slice(1)} ${verb} successfully`;
     successPreviousFocus = document.activeElement;
     [...addSuccess.parentElement.children].forEach((child) => {
         if (child !== addSuccess) child.inert = true;
@@ -394,7 +395,7 @@ addSuccess.addEventListener("keydown", (event) => {
     }
 });
 
- document.getElementById("clear-filters").addEventListener("click", () => {
+ document.getElementById("clear-filters")?.addEventListener("click", () => {
     const panel = document.querySelector(".filter-panel");
     panel.querySelectorAll('input[type="search"]').forEach((input) => {
         input.value = "";

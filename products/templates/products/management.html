@@ -1,0 +1,65 @@
+{% extends "products/base.html" %}
+{% load static %}
+{% block title %}Admin | Product Catalog{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'products/dashboard.css' %}">{% endblock %}
+{% block content %}
+{% include "products/includes/header.html" %}
+<div class="row g-4">
+    <aside class="col-12 col-lg-3 col-xl-2">
+        <nav class="nav nav-pills flex-column gap-2 bg-white rounded-4 p-3 shadow-sm" aria-label="Admin sections" role="tablist" aria-orientation="vertical">
+            <span class="small text-secondary px-3 pb-2">MANAGEMENT</span>
+            {% for section in sections %}
+            <button class="nav-link text-start rounded-3 {% if forloop.first %}active{% endif %}" id="{{ section.key }}-tab" data-bs-toggle="pill" data-bs-target="#{{ section.key }}-table" type="button" role="tab" aria-controls="{{ section.key }}-table" aria-selected="{% if forloop.first %}true{% else %}false{% endif %}">{{ section.title }}</button>
+            {% endfor %}
+        </nav>
+    </aside>
+    <div class="col-12 col-lg-9 col-xl-10">
+        <p class="small text-secondary mb-3">UI preview · Sample records. Changes are not saved.</p>
+        <div class="tab-content">
+            {% for section in sections %}
+            <section class="tab-pane fade {% if forloop.first %}show active{% endif %}" id="{{ section.key }}-table" role="tabpanel" aria-labelledby="{{ section.key }}-tab" tabindex="0">
+                <div class="card border-0 shadow-sm p-3 p-md-4">
+                    <div class="d-flex align-items-center justify-content-between gap-3 mb-4">
+                        <h1 class="fs-5 fw-semibold mb-0">{{ section.title }}</h1>
+                        <button type="button" class="btn badge rounded-pill border-0 px-3 py-2 admin-button" data-manage-add="{{ section.key }}">Add {{ section.key }}</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <caption class="visually-hidden">Sample {{ section.title|lower }} with edit and delete actions</caption>
+                            <thead class="table-light"><tr><th scope="col">ID</th><th scope="col">Title</th>{% if section.detail_label %}<th scope="col">{{ section.detail_label }}</th>{% endif %}<th scope="col" class="text-end">Actions</th></tr></thead>
+                            <tbody>
+                                {% for row in section.rows %}
+                                <tr data-kind="{{ section.key }}" data-title="{{ row.title }}" data-category="{{ row.category|default:'' }}" data-tags="{{ row.tags|default:'' }}" data-description="{{ row.description|default:'' }}">
+                                    <td class="text-secondary small">{{ row.id }}</td>
+                                    <td class="small fw-medium">{{ row.title }}</td>
+                                    {% if section.detail_label %}<td class="small text-secondary">{{ row.detail }}</td>{% endif %}
+                                    <td class="text-end text-nowrap">
+                                        <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3" data-manage-edit aria-label="Edit {{ row.title }}">Edit</button>
+                                        <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3 ms-1" data-manage-delete aria-label="Delete {{ row.title }}">Delete</button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% include "products/includes/admin_modal.html" %}
+<div class="modal fade" id="delete-preview" tabindex="-1" aria-labelledby="delete-preview-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 rounded-4 p-2">
+            <div class="modal-header border-0"><h2 id="delete-preview-title" class="fs-5 mb-0">Delete item?</h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
+            <div class="modal-body pt-0"><p id="delete-preview-text"></p><p class="small text-secondary" id="delete-preview-status" role="status">Preview only — no records will be deleted.</p></div>
+            <div class="modal-footer border-0"><button class="btn btn-light btn-sm rounded-pill" data-bs-dismiss="modal" type="button">Cancel</button><button id="confirm-preview-delete" type="button" class="btn btn-danger btn-sm rounded-pill px-3">Delete</button></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'products/dashboard.js' %}"></script>
+<script src="{% static 'products/management.js' %}"></script>
+{% endblock %}

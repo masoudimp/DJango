@@ -216,6 +216,26 @@ Record meaningful project decisions here so the applicant and future agents can 
 
 **Supersedes / superseded by:** Tag creation is now real; category/product creation remain static. DEC-009's zero-query dashboard is superseded by loading saved tags.
 
+### DEC-011: Add a separate management UI preview
+
+- Date: 2026-11-22
+- Status: Accepted
+- Source / decision maker: User
+
+**Context:** Replace the header's Admin modal entry point with a management page featuring Products, Categories, and Tags tables.
+
+**Options considered:** Continue using the modal as the main navigation, or use a separate page with per-section tables and form modals.
+
+**Decision:** Add `/manage/` with static sample tables. Add opens the corresponding form, Edit prefills it from the sample row, and Delete opens a confirmation preview. Reuse the existing header, form modal, category/tag pickers, and discard behavior. All operations on this new page are UI-only, including Add tag; the existing tag backend is preserved but not called from this page.
+
+**Rationale:** Gives each entity a clear management section while honoring the user's explicit UI-only scope.
+
+**Tradeoffs:** Preview submissions do not change table rows or persisted data. Real CRUD and Django-admin sample population are not completed by this UI. No authentication is introduced for the static preview.
+
+**Implementation / verification:** Django checks and five existing tag tests passed; JavaScript syntax and whitespace checks passed. Verified the management page returns HTTP 200 with zero database queries, three static forms without POST actions, unique IDs, and valid modal targets. Browser access was unavailable and native Chrome access was not approved, so visual interaction testing could not be completed. No TODOs added.
+
+**Supersedes / superseded by:** Replaces the header Admin button's modal-opening behavior. DEC-010's tag persistence implementation remains in place.
+
 ## Entry template
 
 Copy this template into the Decisions section for each new entry:

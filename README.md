@@ -4,8 +4,7 @@
 
 ### Create a tag
 
-Run migrations, start the server, then choose **Admin → Add tag** on the dashboard.
-Enter a title and submit. This form now saves to SQLite using a normal Django POST
+The existing `/tags/create/` endpoint and original tag form save to SQLite using a normal Django POST
 and redirects back with a success message. Empty, whitespace-only, overlong (more
 than 100 characters), and duplicate titles are rejected. Titles are trimmed; the
 existing database uniqueness rule is case-sensitive on SQLite.
@@ -14,6 +13,20 @@ The tag pickers load saved tags after the page reloads. Category and product
 creation remain static previews. Submitting the tag form reloads the whole page,
 so unfinished entries in other preview forms are not retained. This local demo
 endpoint uses CSRF protection but does not yet require login.
+
+### Management UI preview
+
+The header's **Admin** button now opens `/manage/`. Choose Products, Categories,
+or Tags to see a sample table with row-level Edit/Delete buttons and an Add button.
+Add opens the relevant form in a modal; Edit opens it prefilled with the sample row.
+Delete opens a confirmation preview. These new management forms are deliberately
+UI-only: they do not call the real tag endpoint, save data, or delete records.
+The tables remain sample data after previewing an operation.
+
+The existing category/tag pickers, modal artwork, discard confirmation, and header
+are reused. The original tag backend remains implemented and tested, but connecting
+it to this new management page is outside this UI-only change. `/admin/` remains
+the separate built-in Django admin URL.
 
 The assignment still requires sample data to be entered through Django admin;
 this custom form does not replace that requirement. No sample data was populated.
@@ -46,6 +59,8 @@ are deferred in the [user-requested TODO list](docs/todo.md).
 Codex also integrated Bootstrap and generated the shared base template, static
 dashboard view and templates, styling, and product image fallback.
 Codex implemented the tag ModelForm, POST view, template integration, and tests.
+Codex also created the management UI preview and extracted the shared header and
+form modal templates.
 
 Codex generated the initial `Tag`, `Category`, `AssetType`, `Asset`, and `Product` models,
 app configuration, and migrations, added the Category parent relation, and assisted
