@@ -22,6 +22,9 @@ function openManagementForm(kind, row, trigger) {
     form.querySelector("h3").hidden = true;
     form.querySelector('[type="submit"]').textContent = editing ? "Save changes" : `Add ${kind}`;
     form.dataset.mode = editing ? "edit" : "add";
+    if (kind === "tag") {
+        form.action = editing ? row.dataset.editUrl : form.dataset.createUrl;
+    }
     document.querySelectorAll("#admin-forms > .collapse").forEach((item) => {
         item.classList.toggle("show", item === panel);
     });
@@ -94,15 +97,10 @@ if (managementSuccess) {
 }
 
 const createTagForm = document.getElementById("create-tag-form");
-createTagForm.addEventListener("submit", (event) => {
-    if (createTagForm.dataset.mode === "edit") {
-        event.preventDefault();
-        showAddSuccess(createTagForm);
-    }
-});
-
 if (document.getElementById("management-tag-invalid")) {
-    document.getElementById("admin-modal-title").textContent = "Add tag";
+    const editing = createTagForm.dataset.mode === "edit";
+    document.getElementById("admin-modal-title").textContent = editing ? "Edit tag" : "Add tag";
+    createTagForm.querySelector('[type="submit"]').textContent = editing ? "Save changes" : "Add tag";
     document.getElementById("add-tag-panel").classList.add("show");
     createTagForm.querySelector("h3").hidden = true;
     adminModalElement.addEventListener("shown.bs.modal", () => {

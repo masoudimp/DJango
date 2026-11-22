@@ -29,7 +29,10 @@ not yet require login.
 
 Add tag saves through the existing POST endpoint, returns to the Tags table, and
 shows a success modal. Invalid titles reopen the form with the entered value and
-validation error. Product/category actions and tag editing remain previews.
+validation error. Tag editing saves through a CSRF-protected POST using the same TagForm and modal.
+It preserves the tag ID and product links, rejects invalid or duplicate titles,
+and returns to the Tags table with a success modal. Only product/category actions
+remain previews. Codex implemented the tag edit endpoint, form integration, and tests.
 No real tags were deleted during development checks; tests use a separate database.
 
 The existing category/tag pickers, modal artwork, discard confirmation, and header

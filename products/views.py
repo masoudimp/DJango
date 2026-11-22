@@ -23,6 +23,22 @@ def create_tag(request):
 
 
 @require_POST
+def edit_tag(request, pk):
+    tag = get_object_or_404(Tag, pk=pk)
+    form = TagForm(request.POST, instance=tag)
+    if form.is_valid():
+        try:
+            with transaction.atomic():
+                form.save()
+        except IntegrityError:
+            form.add_error("title", "A tag with this title already exists.")
+        else:
+            messages.success(request, "Tag updated successfully.")
+            return redirect("/manage/?section=tag")
+    return management(request, tag_form=form)
+
+
+@require_POST
 def delete_tag(request, pk):
     tag = get_object_or_404(Tag, pk=pk)
     tag.delete()

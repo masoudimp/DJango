@@ -278,6 +278,18 @@ Record meaningful project decisions here so the applicant and future agents can 
 
 **Verification:** Django tests and JavaScript syntax checked. No TODO entries added.
 
+### DEC-015: Save tag edits from management
+
+- Date: 2026-11-22
+- Status: Accepted
+- Source / decision maker: User
+
+**Decision:** Reuse TagForm with the existing tag instance and shared modal. Submit edits to a POST-only endpoint; return validation errors to the same edit form and successful edits to the Tags table with a success modal.
+
+**Rationale / tradeoffs:** Keeps the implementation simple and preserves product associations. Existing local-demo authentication limitations remain unchanged. Product/category actions remain previews.
+
+**Implementation / verification:** All 15 Django tests passed, covering edits, validation, unchanged titles, product associations, missing records, POST restrictions, and CSRF. JavaScript syntax check passed. No TODOs added.
+
 ## Entry template
 
 Copy this template into the Decisions section for each new entry:

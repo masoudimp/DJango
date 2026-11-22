@@ -87,3 +87,48 @@ class DeleteTagTests(TestCase):
         token = client.cookies["csrftoken"].value
         self.assertEqual(client.post(self.url, {"csrfmiddlewaretoken": token}).status_code, 302)
         self.assertFalse(Tag.objects.filter(pk=self.tag.pk).exists())
+
+
+class EditTagTests(TestCase):
+    def setUp(self):
+        self.tag = Tag.objects.create(title="Cordless")
+        self.url = reverse("products:edit_tag", args=[self.tag.pk])
+
+    def test_edit_preserves_id_and_product_links(self):
+        category = Category.objects.create(title="Tools")
+        product = Product.objects.create(title="Drill", category=category)
+        product.tags.add(self.tag)
+        response = self.client.post(self.url, {"title": "  Portable  "}, follow=True)
+        self.assertRedirects(response, "/manage/?section=tag")
+        self.assertContains(response, "Tag updated successfully.")
+        self.assertContains(response, 'id="management-success"')
+        self.tag.refresh_from_db()
+        self.assertEqual(self.tag.title, "Portable")
+        self.assertEqual(list(product.tags.all()), [self.tag])
+        self.assertEqual(Tag.objects.count(), 1)
+
+    def test_invalid_edit_keeps_record_and_reopens_edit_form(self):
+        Tag.objects.create(title="Compact")
+        for title in ["", "   ", "x" * 101, "Compact"]:
+            with self.subTest(title=title):
+                response = self.client.post(self.url, {"title": title})
+                self.assertContains(response, 'id="management-tag-invalid"', status_code=400)
+                self.assertContains(response, 'data-mode="edit"', status_code=400)
+                self.assertContains(response, f'action="{self.url}"', status_code=400)
+                self.tag.refresh_from_db()
+                self.assertEqual(self.tag.title, "Cordless")
+
+    def test_unchanged_title_is_valid(self):
+        self.assertEqual(self.client.post(self.url, {"title": "Cordless"}).status_code, 302)
+
+    def test_method_missing_record_and_csrf(self):
+        self.assertEqual(self.client.get(self.url).status_code, 405)
+        client = Client(enforce_csrf_checks=True)
+        self.assertEqual(client.post(self.url, {"title": "Portable"}).status_code, 403)
+        client.get(reverse("products:management"))
+        token = client.cookies["csrftoken"].value
+        self.assertEqual(client.post(self.url, {
+            "title": "Portable", "csrfmiddlewaretoken": token,
+        }).status_code, 302)
+        self.tag.delete()
+        self.assertEqual(self.client.post(self.url, {"title": "Portable"}).status_code, 404)
