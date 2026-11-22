@@ -433,6 +433,48 @@ remain at /private/tmp/django-admin-entry-ckfbz2jh/original.sqlite3 and
 sample entry is now complete; reviewer data delivery is a separate remaining task.
 This does not certify applicant personal contributions under the AI policy.
 
+### DEC-023: Allow Git to see the SQLite database
+
+- Date: 2026-11-22
+- Status: Accepted
+- Source / decision maker: User
+
+**Decision:** Remove only `db.sqlite3` from .gitignore; keep the journal excluded.
+No database content was changed, staged, committed, or pushed.
+
+**Warning / tradeoff:** Before editing, informed the user that the working database
+contains the admin account/password hash and must not be published as-is under
+the project's credential-handling instructions. A sanitized database or catalog-only
+fixture is still needed before sharing. The ignore-rule change alone does not
+publish credentials or complete sample-data delivery.
+
+### DEC-024: Provide a one-command local demo with its populated database
+
+- Date: 2026-11-22
+- Status: Accepted
+- Source / decision maker: User
+
+**Decision:** Provide `python3 run.py` (Windows: `py run.py`) to create .venv,
+install pinned dependencies, migrate, and launch on localhost. Include the populated
+SQLite database and existing assignment-only admin/admin account for convenience.
+Document Python and first-install internet prerequisites honestly; no claim that
+Python or packages can be absent while running without installation.
+
+**Policy clarification:** The earlier prohibition on publishing a demo password
+hash was internal guidance, not an established employer requirement. User explicitly
+chose a runnable local assignment with the database. This supersedes DEC-023's
+requirement to sanitize the demo account before delivery; do not describe that
+internal recommendation as an employer rule. No repository publication is performed
+in this change.
+
+**Verification:** Ran the launcher against a fresh local copy with no .venv and
+the populated SQLite database. It created the environment, installed the pinned
+packages, applied migrations, and started on localhost port 8021. HTTP checks
+confirmed the dashboard contains all 20 cards, admin login loads, and jacket
+filtering works. Verified the admin/admin account authenticates as a superuser.
+Stopped the test server cleanly. Windows and the published repository were not
+tested; files still need commit/push for reviewers to clone them.
+
 ## Entry template
 
 Copy this template into the Decisions section for each new entry:

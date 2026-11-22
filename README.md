@@ -5,52 +5,59 @@ multiple-tag filtering. Products, categories, and tags are managed through the
 built-in Django admin. The dashboard header's **Admin** link opens `/admin/`.
 The former custom `/manage/` page and its mutation endpoints have been removed.
 
-## Install and run from scratch
+## Quick start
 
-Prerequisites:
-
-- Python 3.12 or newer, with `pip`, `venv`, and SQLite support. The clean-install
-  check used Python 3.15.2 on macOS; other Python versions/platforms were not tested.
-- Git to clone the repository and internet access for the initial package install.
-- Node.js is optional and only needed for JavaScript tests (verified with 26.7.0).
-
-From a terminal on macOS or Linux:
+Install Python 3.12 or newer, then clone and run:
 
 ```sh
 git clone https://github.com/masoudimp/DJango.git
 cd DJango
-python3 --version
+python3 run.py
+```
+
+On Windows, use `py run.py`. The launcher creates `.venv`, installs the pinned
+requirements, applies migrations, and starts the server. No manual environment
+activation, database configuration, or account creation is needed. Internet is
+required for the first dependency installation. Python needs `venv`, `pip`, and
+SQLite support. Python 3.15.2 on macOS was used for verification; Windows has not
+been tested.
+
+- Dashboard: http://127.0.0.1:8000/
+- Django admin: http://127.0.0.1:8000/admin/
+- Demo username: `admin`
+- Demo password: `admin`
+
+The included `db.sqlite3` contains 20 products, 13 categories, 10 tags, and the
+assignment-only demo admin account. This database is intentionally included for
+reviewer convenience. Changes made in the app are saved to this local database.
+The shared demo credentials are for this local assignment, not a production account.
+No `.env` file, npm installation, or frontend build is needed; Bootstrap is bundled.
+
+Stop the server with Ctrl+C. If port 8000 is occupied:
+
+```sh
+python3 run.py --port 8001
+```
+
+The launcher uses the same environment and data on subsequent runs. Settings in
+`config/settings.py` target local development (`DEBUG=True`, SQLite, local secret
+key); the server binds to `127.0.0.1` only.
+
+## Manual setup (optional)
+
+If you prefer running each step yourself on macOS/Linux:
+
+```sh
 python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
-.venv/bin/python -m pip check
 .venv/bin/python manage.py migrate
-.venv/bin/python manage.py check
-.venv/bin/python manage.py createsuperuser
 .venv/bin/python manage.py runserver
 ```
 
-On Windows, create the environment with `py -m venv .venv`, and replace
-`.venv/bin/python` with `.venv\Scripts\python.exe` in the remaining commands.
-Windows setup has not been tested. Using the environment's Python directly avoids
-requiring shell activation. To leave the development server, press Ctrl+C.
-
-`requirements.txt` pins Django 6.1.3 and its asgiref/sqlparse dependencies to the
-versions verified by a fresh package install. No npm install or frontend build
-is needed: Bootstrap CSS and bundled JavaScript are served from
-`products/static/products/vendor/bootstrap/`.
-
-Open http://127.0.0.1:8000/ for the dashboard and
-http://127.0.0.1:8000/admin/ for management. Follow the interactive superuser prompts
-and use your chosen credentials. No default account is included in the repository.
-
-SQLite stores local data in `db.sqlite3`, which is excluded from Git. Migration
-creates the tables, not sample products or accounts; an empty dashboard on first
-startup is expected. Populate records through Django admin as described below.
-
-No environment variables or `.env` file are required for local setup. Settings in
-`config/settings.py` are for local development (`DEBUG=True`, local development
-secret key, SQLite). These instructions do not configure a production deployment.
-If port 8000 is occupied, use `manage.py runserver 8001` and open port 8001 instead.
+On Windows use `py -m venv .venv` and `.venv\Scripts\python.exe` instead of
+`.venv/bin/python`. If starting without the included database, migrations create
+empty tables; use `manage.py createsuperuser` to create an account, then enter
+sample records through Django admin.
 
 ## Django admin and sample data
 
@@ -72,9 +79,8 @@ existing login accounts were preserved. IDs may differ from the old dataset.
 
 Codex operated the browser forms with user authorization; this is not a claim
 that the applicant personally typed every record. Earlier direct/custom-UI
-population was superseded by this full admin-based entry. The database remains
-excluded from Git, so a reproducible sample-data delivery process is still needed
-for reviewers. Tests do not count as working-database sample entry.
+population was superseded by this full admin-based entry. The populated SQLite database and local demo account are included for reviewer
+convenience at the user's explicit request. Tests do not count as working-database sample entry.
 
 ## Models and validation
 
@@ -108,6 +114,12 @@ requests, and replaces only the product cards. Clear resets all filters and
 sends one request. Filter selections are not persisted across page reloads.
 
 ## Verification
+
+The `python3 run.py --port 8021` quick-start path was also verified in a fresh
+local copy without a virtual environment, using the included populated database.
+It installed dependencies and started successfully; the dashboard showed 20
+products, search worked, and the demo admin credentials authenticated.
+
 
 ```sh
 .venv/bin/python manage.py check
@@ -153,7 +165,7 @@ browsers were not tested.
 
 Codex generated the initial models and migrations, dashboard templates and styling,
 filter DTO/query logic, JavaScript interactions, tests, Django admin integration,
-and dependency/setup documentation.
+dependency/setup documentation, and the one-command launcher.
 Codex also built, then removed at the applicant's request, a custom CRUD panel.
 The original AI-assisted sample insertion used direct database access. At the
 user's request, Codex subsequently recreated the entire sample catalog through
