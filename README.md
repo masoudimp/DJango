@@ -1,5 +1,17 @@
 # DJango
 
+## Current models
+
+The `products` app currently defines `Tag`: an automatic integer primary key (`id`)
+and a required, unique `title` of up to 100 characters. Product and category models
+are not implemented yet.
+
+## AI assistance
+
+Codex generated the initial `Tag` model, app configuration, and migration, and
+assisted with setup and documentation. Applicant review and personal modifications
+to the generated implementation are pending.
+
 ## Database
 
 The project uses SQLite, configured in `config/settings.py`. No separate database

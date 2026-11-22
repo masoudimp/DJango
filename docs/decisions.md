@@ -56,6 +56,26 @@ Record meaningful project decisions here so the applicant and future agents can 
 
 **Supersedes / superseded by:** None.
 
+### DEC-003: Define Tag with an ID and title
+
+- Date: 2026-11-22
+- Status: Accepted
+- Source / decision maker: User (fields); Agent (app placement and field constraints)
+
+**Context:** Implement the tag model first, with only `id` and `title`.
+
+**Options considered:** An explicit ID versus Django's automatic primary key; a plain title versus a unique title.
+
+**Decision:** Define `Tag` in the `products` app, inheriting directly from `models.Model`. Use an automatic `BigAutoField` ID and a required `CharField` title with `max_length=100` and `unique=True`. Return the title from `__str__`.
+
+**Rationale:** Keeps the model simple and prevents duplicate titles while giving it a readable display name. No custom base model is needed.
+
+**Tradeoffs:** The title length and uniqueness are implementation choices, not employer requirements. Uniqueness does not enforce case-insensitive matching; case variants may coexist.
+
+**Implementation / verification:** Added the model, registered its app, and generated `0001_initial.py`. Django's system check passed. The migration has not been applied; product relationships and admin registration remain pending.
+
+**Supersedes / superseded by:** None.
+
 ## Entry template
 
 Copy this template into the Decisions section for each new entry:
