@@ -5,6 +5,10 @@
 <link rel="stylesheet" href="{% static 'products/dashboard.css' %}">
 {% endblock %}
 {% block content %}
+{% for message in messages %}
+    <span id="tag-saved" hidden>{{ message }}</span>
+{% endfor %}
+{% if tag_form %}<span id="tag-invalid" hidden></span>{% endif %}
 <header class="d-flex align-items-center justify-content-between gap-3 border-bottom pb-3 mb-4">
     <div class="d-flex align-items-center gap-2">
     <a href="{% url 'products:dashboard' %}" class="brand text-decoration-none">
@@ -116,12 +120,13 @@
                             </form>
                         </div>
                         <div id="add-tag-panel" class="collapse" data-bs-parent="#admin-forms">
-                            <form class="admin-demo-form pb-3" aria-label="Add tag">
+                            <form id="create-tag-form" class="admin-demo-form pb-3" aria-label="Add tag" method="post" action="{% url 'products:create_tag' %}">
+                                {% csrf_token %}
                                 <h3 class="fs-6 mb-3">Add tag</h3>
                                 <label for="new-tag-title" class="form-label small">Title</label>
-                                <input id="new-tag-title" class="form-control form-control-sm mb-3" maxlength="100" required>
+                                <input id="new-tag-title" name="title" value="{{ tag_form.title.value|default_if_none:'' }}" class="form-control form-control-sm mb-3" maxlength="100" aria-describedby="tag-form-status" required>
                                 <button type="submit" class="btn btn-success btn-sm rounded-pill px-3">Add tag</button>
-                                <p class="admin-form-status small text-secondary mt-2 mb-0" role="status"></p>
+                                <div id="tag-form-status" class="admin-form-status small text-danger mt-2 mb-0" role="status">{{ tag_form.title.errors }}</div>
                             </form>
                         </div>
                         <div id="add-product-panel" class="collapse" data-bs-parent="#admin-forms">

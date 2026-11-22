@@ -4,7 +4,7 @@ document.getElementById("upload-product-image").addEventListener("click", () => 
 productImageInput.addEventListener("change", () => {
     document.getElementById("product-image-name").textContent = productImageInput.files[0]?.name || "";
 });
-document.querySelectorAll(".admin-demo-form").forEach((form) => {
+document.querySelectorAll('.admin-demo-form:not(#create-tag-form)').forEach((form) => {
     form.addEventListener("submit", (event) => {
         event.preventDefault();
         const category = form.querySelector('input[name="category"]');
@@ -355,7 +355,9 @@ const addSuccess = document.getElementById("add-success");
 const doneAdding = document.getElementById("close-add-success");
 let successPreviousFocus = null;
 let successClosing = false;
-function showAddSuccess(form) {
+function showAddSuccess(form, saved = false) {
+    document.getElementById("add-success-note").textContent = saved
+        ? "Your tag has been saved." : "Preview only — no data has been saved.";
     const entity = form.getAttribute("aria-label").replace("Add ", "");
     document.getElementById("add-success-title").textContent = `${entity[0].toUpperCase()}${entity.slice(1)} added successfully`;
     successPreviousFocus = document.activeElement;
@@ -401,3 +403,16 @@ addSuccess.addEventListener("keydown", (event) => {
     panel.querySelector('[data-category=""]').click();
     panel.querySelector("#clear-tags").click();
 });
+
+// A normal Django form POST reloads this page with success or validation errors.
+if (document.getElementById("tag-saved") || document.getElementById("tag-invalid")) {
+    adminModalElement.addEventListener("shown.bs.modal", () => {
+        if (document.getElementById("tag-saved")) {
+            showAddSuccess(document.getElementById("create-tag-form"), true);
+        } else {
+            bootstrap.Collapse.getOrCreateInstance(document.getElementById("add-tag-panel"), { toggle: false }).show();
+            document.getElementById("new-tag-title").focus();
+        }
+    }, { once: true });
+    bootstrap.Modal.getOrCreateInstance(adminModalElement).show();
+}

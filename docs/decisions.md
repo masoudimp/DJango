@@ -196,6 +196,26 @@ Record meaningful project decisions here so the applicant and future agents can 
 
 **Supersedes / superseded by:** None.
 
+### DEC-010: Create tags using a simple Django form POST
+
+- Date: 2026-11-22
+- Status: Accepted
+- Source / decision maker: User (real tag creation and beginner-friendly code); Agent (ModelForm and normal POST/redirect)
+
+**Context:** Connect the existing Add tag UI to persistence while keeping code easy to follow.
+
+**Options considered:** AJAX submission or a normal Django form submission.
+
+**Decision:** Use TagForm, a POST-only view, Django CSRF and messages, and redirect after saving. Re-render invalid submissions with the entered title and errors. Use existing database uniqueness and handle concurrent duplicate writes. Tag pickers load database titles after reload; other creation forms remain previews.
+
+**Rationale:** Standard Django form handling minimizes custom JavaScript and retains the established success modal.
+
+**Tradeoffs:** Full-page submission does not preserve unsaved entries in other preview forms. This local demo does not yet enforce authentication. The user was reminded before implementation that custom creation does not replace the employer's required Django-admin sample population.
+
+**Implementation / verification:** Applied existing migrations. Five Django tests passed for saving, invalid titles, duplicate titles, method restriction, and CSRF. JavaScript syntax passed. No sample tags were inserted into the working database; tests used an isolated test database. No TODOs added.
+
+**Supersedes / superseded by:** Tag creation is now real; category/product creation remain static. DEC-009's zero-query dashboard is superseded by loading saved tags.
+
 ## Entry template
 
 Copy this template into the Decisions section for each new entry:

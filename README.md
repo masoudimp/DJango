@@ -2,6 +2,24 @@
 
 ## Current models
 
+### Create a tag
+
+Run migrations, start the server, then choose **Admin → Add tag** on the dashboard.
+Enter a title and submit. This form now saves to SQLite using a normal Django POST
+and redirects back with a success message. Empty, whitespace-only, overlong (more
+than 100 characters), and duplicate titles are rejected. Titles are trimmed; the
+existing database uniqueness rule is case-sensitive on SQLite.
+
+The tag pickers load saved tags after the page reloads. Category and product
+creation remain static previews. Submitting the tag form reloads the whole page,
+so unfinished entries in other preview forms are not retained. This local demo
+endpoint uses CSRF protection but does not yet require login.
+
+The assignment still requires sample data to be entered through Django admin;
+this custom form does not replace that requirement. No sample data was populated.
+
+Run the focused tests with `.venv/bin/python manage.py test products`.
+
 The `products` app currently defines `Tag` and `Category`. Each has an automatic
 integer primary key (`id`) and a required, unique `title` of up to 100 characters.
 `Product` has an automatic ID, a required title (up to 200 characters, not unique),
@@ -27,6 +45,7 @@ are deferred in the [user-requested TODO list](docs/todo.md).
 
 Codex also integrated Bootstrap and generated the shared base template, static
 dashboard view and templates, styling, and product image fallback.
+Codex implemented the tag ModelForm, POST view, template integration, and tests.
 
 Codex generated the initial `Tag`, `Category`, `AssetType`, `Asset`, and `Product` models,
 app configuration, and migrations, added the Category parent relation, and assisted
@@ -45,13 +64,12 @@ New templates can use `{% extends "products/base.html" %}` and override the
 
 Run `.venv/bin/python manage.py runserver` and open http://127.0.0.1:8000/ for the
 dashboard. The six product cards are static demo content, not database
-records. Category selection and the multi-select tag panel use static sample
-options; tags support clearing selections. Both panels use Bootstrap Collapse to expand inline in the sidebar and include case-insensitive
+records. Category options remain static; tag options come from SQLite and support
+clearing selections. Both panels use Bootstrap Collapse to expand inline in the sidebar and include case-insensitive
 search over their sample options. Category search reveals matching branches and
 their ancestors; clearing the search restores previous expansion states. Tag
 search preserves existing selections. These selections do not filter the
-cards yet, and the search input remains disabled. No database queries
-are needed to display this page.
+cards yet, and the search input remains disabled. The dashboard queries saved tags.
 
 The supplied placeholder image was moved to
 `products/static/products/assets/images/image-not-available.jpg`. The reusable
