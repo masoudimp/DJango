@@ -16,7 +16,25 @@ Record meaningful project decisions here so the applicant and future agents can 
 
 ## Decisions
 
-No technical decisions have been recorded yet. Suggestions in the assignment instructions remain recommendations until a choice is made.
+### DEC-001: Use Django's MTV architecture
+
+- Date: 2026-11-22
+- Status: Accepted
+- Source / decision maker: User
+
+**Context:** Choose an application structure appropriate for this Django assignment and the applicant's introduction to Django.
+
+**Options considered:** Django's conventional Model–Template–View (MTV) structure; a layered Data/Business/Controller structure; strict Clean Architecture with independent domain entities and repository contracts.
+
+**Decision:** Use Django's conventional MTV architecture. Models define data and relationships through Django ORM, templates render HTML, and views handle HTTP requests and responses with URL routing. Organize related functionality into Django apps. A service module may be added if business logic warrants it; it is not required by this decision.
+
+**Rationale:** MTV aligns with the assignment's emphasis on Django models, querysets, views, and a simple HTML interface. It keeps the project approachable and appropriately scoped for a short take-home exercise.
+
+**Tradeoffs:** Models depend on Django ORM, so the domain is not independent of the framework. This avoids the additional entities, mappings, and repository abstractions of strict Clean Architecture.
+
+**Implementation / verification:** Decision recorded; feature implementation is pending. No application code was changed as part of this entry.
+
+**Supersedes / superseded by:** None.
 
 ## Entry template
 

@@ -6,6 +6,16 @@ Build the Django take-home assignment for Remarcable, Inc. This document turns t
 
 Focus on functional Django models, relationships, querysets, views, and clear documentation. Styling and visual design are not evaluation priorities. Keep the implementation small enough for an assignment intended to take a few hours.
 
+## Conflicts with the original assignment
+
+Before implementing a user decision, check whether it conflicts with the original Remarcable assignment supplied by the user, including its deliverables, submission requirements, and AI policy.
+
+- If there is a conflict, **warn the user before taking the conflicting action**. Identify the original requirement, explain how the requested decision differs, and describe the concrete impact on assignment compliance or evaluation.
+- Suggest a compliant alternative when useful, then continue with the user's requested direction after giving the warning. This warning rule does not itself require another confirmation or a pause.
+- Record the decision, the conflicting requirement, and the warning in [the decision log](decisions.md). Keep any affected README notes accurate, and do not mark an unmet requirement as complete or claim the result fully complies with the assignment.
+- Distinguish actual employer requirements from this document's recommendations and agent assumptions. A different permitted approach is not a conflict; for example, the employer explicitly allows either Django templates or a front-end framework.
+- If the original requirement is ambiguous, explain the uncertainty instead of presenting an inferred restriction as a requirement.
+
 ## 1. Inspect and plan
 
 - [ ] Read repository instructions and existing source before making changes.
