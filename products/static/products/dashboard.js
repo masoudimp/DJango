@@ -18,7 +18,10 @@ function openProductModal(card) {
     document.querySelectorAll(".product-description").forEach((element) => bootstrap.Tooltip.getInstance(element)?.hide());
     productModal.show();
 }
-document.querySelectorAll(".product-card").forEach((card) => {
+function initializeProductCards(root) {
+    const observers = [];
+    const tooltips = [];
+root.querySelectorAll(".product-card").forEach((card) => {
     card.addEventListener("click", (event) => {
         if (event.target.closest("button, a, input")) return;
         openProductModal(card);
@@ -30,8 +33,7 @@ document.querySelectorAll(".product-card").forEach((card) => {
         }
     });
 });
-productModalElement?.addEventListener("hidden.bs.modal", () => activeProductCard?.focus({ preventScroll: true }));
-document.querySelectorAll(".badge-rail").forEach((rail) => {
+root.querySelectorAll(".badge-rail").forEach((rail) => {
     const track = rail.querySelector(".badge-track");
     const buttons = [...rail.querySelectorAll(".badge-scroll")];
     const update = () => {
@@ -51,17 +53,27 @@ document.querySelectorAll(".badge-rail").forEach((rail) => {
         });
     }));
     track.addEventListener("scroll", update, { passive: true });
-    new ResizeObserver(update).observe(rail);
+    const observer = new ResizeObserver(update);
+    observer.observe(rail);
+    observers.push(observer);
     update();
 });
-document.querySelectorAll('.product-description[data-bs-toggle="tooltip"]').forEach((element) => {
-    new bootstrap.Tooltip(element, {
+root.querySelectorAll('.product-description[data-bs-toggle="tooltip"]').forEach((element) => {
+    tooltips.push(new bootstrap.Tooltip(element, {
         container: "body",
         trigger: "hover focus",
         customClass: "product-description-tooltip",
         html: false,
-    });
+    }));
 });
+    return () => {
+        observers.forEach((observer) => observer.disconnect());
+        tooltips.forEach((tooltip) => tooltip.dispose());
+    };
+}
+let disposeProductCards = initializeProductCards(document);
+productModalElement?.addEventListener("hidden.bs.modal", () => activeProductCard?.focus({ preventScroll: true }));
+
 document.addEventListener("pointerdown", () => {
     document.documentElement.dataset.inputMode = "pointer";
 }, true);
@@ -141,14 +153,18 @@ if (selectedOption) {
 
 categoryOptions.forEach((option) => {
     option.addEventListener("click", () => {
-        getElement("category-summary").textContent = option.textContent;
-        getElement("category-value").value = option.dataset.category;
+        // Clicking the selected dashboard category again clears that filter.
+        const deselect = root.closest(".filter-panel") && option.dataset.category
+            && getElement("category-value").value === option.dataset.category;
+        const selected = deselect ? root.querySelector('[data-category=""]') : option;
+        getElement("category-summary").textContent = selected.textContent;
+        getElement("category-value").value = selected.dataset.category;
         categoryOptions.forEach((item) => {
             item.classList.remove("active");
             item.removeAttribute("aria-current");
         });
-        option.classList.add("active");
-        option.setAttribute("aria-current", "true");
+        selected.classList.add("active");
+        selected.setAttribute("aria-current", "true");
         const trigger = getElement("category");
         if (trigger.dataset.bsToggle === "dropdown") {
             bootstrap.Dropdown.getOrCreateInstance(trigger).hide();
@@ -385,16 +401,6 @@ addSuccess?.addEventListener("keydown", (event) => {
         event.preventDefault();
         doneAdding.focus();
     }
-});
-
- document.getElementById("clear-filters")?.addEventListener("click", () => {
-    const panel = document.querySelector(".filter-panel");
-    panel.querySelectorAll('input[type="search"]').forEach((input) => {
-        input.value = "";
-        input.dispatchEvent(new Event("input", { bubbles: true }));
-    });
-    panel.querySelector('[data-category=""]').click();
-    panel.querySelector("#clear-tags").click();
 });
 
 // A top-layer popover escapes the scrollable modal without moving form controls.

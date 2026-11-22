@@ -1,7 +1,11 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib import messages
 from django.db import IntegrityError, transaction
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_GET, require_POST
+from django.http import JsonResponse
+
+from .dtos import ProductFilterRequest
+from .filters import filter_products
 from django.db.models.deletion import ProtectedError
 
 from .forms import CategoryForm, ProductForm, TagForm
@@ -136,9 +140,20 @@ def delete_product(request, pk):
 
 def dashboard(request):
     return render(request, "products/dashboard.html", {
-        "products": Product.objects.select_related("category", "image").prefetch_related("tags").order_by("title", "id"),
+        "products": filter_products(ProductFilterRequest()),
         "demo_tags": Tag.objects.order_by("title", "id"),
         "categories": category_tree(),
+    })
+
+
+@require_GET
+def product_list(request):
+    try:
+        filters = ProductFilterRequest.from_query(request.GET)
+    except ValueError:
+        return JsonResponse({"error": "Category and tag IDs must be positive integers."}, status=400)
+    return render(request, "products/includes/product_list.html", {
+        "products": filter_products(filters),
     })
 
 

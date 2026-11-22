@@ -9,26 +9,25 @@
 <section aria-label="Products" class="catalog-layout">
     <fieldset aria-label="Product filters" class="filter-panel card border-0 shadow-sm p-3 mb-0">
         <div class="row g-3">
-            <div class="col-12"><label for="search" class="form-label">Search</label><input disabled id="search" class="form-control" type="search" placeholder="Search product descriptions"></div>
+            <div class="col-12"><label for="search" class="form-label">Search</label><input id="search" class="form-control" type="search" placeholder="Search product names or descriptions"></div>
             <div class="col-12">
                 <label for="category" class="form-label">Category</label>
                 {% include "products/includes/category_picker.html" with prefix="" expanded=True %}
             </div>
             <div class="col-12">
                 <label for="tags" class="form-label">Tags</label>
-                {% include "products/includes/tags_picker.html" with prefix="" expanded=True %}
+                {% include "products/includes/tags_picker.html" with prefix="" expanded=True use_ids=True %}
             </div>
             <div class="col-12 d-flex justify-content-end">
                 <button type="button" id="clear-filters" class="btn btn-outline-secondary btn-sm rounded-pill px-3">Clear filters</button>
             </div>
         </div>
     </fieldset>
-    <div class="product-grid">
-        {% for product in products %}
-        <div>{% include "products/includes/product_card.html" %}</div>
-        {% empty %}
-        <p class="text-secondary">No products found.</p>
-        {% endfor %}
+    <div>
+        <p id="filter-status" class="small text-secondary" role="status" aria-live="polite"></p>
+        <div id="product-grid" class="product-grid" data-filter-url="{% url 'products:product_list' %}">
+            {% include "products/includes/product_list.html" %}
+        </div>
     </div>
 </section>
 <div class="modal fade" id="product-modal" tabindex="-1" aria-labelledby="product-modal-title" aria-hidden="true">
@@ -55,4 +54,5 @@
 {% endblock %}
 {% block extra_js %}
 <script src="{% static 'products/dashboard.js' %}"></script>
+<script src="{% static 'products/filters.js' %}"></script>
 {% endblock %}
